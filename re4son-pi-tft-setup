@@ -147,11 +147,6 @@ EOF
     cat >> /boot/config.txt <<EOF
 
 # --- added by re4son-pi-tft-setup $date ---
-[pi1]
-device_tree=bcm2708-rpi-b-plus.dtb
-[pi2]
-device_tree=bcm2709-rpi-2-b.dtb
-[all]
 dtparam=spi=on
 dtparam=i2c1=on
 dtparam=i2c_arm=on

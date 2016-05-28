@@ -75,3 +75,14 @@ For a full list of available options, check the help:
 ```sh
 re4son-pi-tft-helper -h
 ```
+
+To reset all settings, just run:
+
+```sh
+mount /dev/mmcblk0p1 /boot
+rm /boot/config.txt
+rm /etc/X11/xorg.conf.d/99-fbdev.conf
+rm /etc/X11/xorg.conf.d/99-calibration.conf
+rm /etc/pointercal
+rm /dev/input/touchscreen
+```

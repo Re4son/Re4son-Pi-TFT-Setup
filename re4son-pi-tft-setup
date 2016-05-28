@@ -4,7 +4,6 @@ set -e
 
 function print_version() {
     echo "Re4son Pi-TFT Setup v1.2.0"
-    echo "Based on Adafruit PiTFT Helper v0.8.0"
     exit 1
 }
 

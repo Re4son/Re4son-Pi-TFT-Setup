@@ -273,6 +273,12 @@ EOF
 8 -8432 32432138 5699 -112 -965922 65536
 EOF
     fi
+    
+    if [ "${pitfttype}" == "wave35" ]; then
+        cat > /etc/pointercal <<EOF
+8 -8432 32432138 5699 -112 -965922 65536
+EOF
+    fi
 
     if [ "${pitfttype}" == "28c" ]; then
         cat > /etc/pointercal <<EOF
@@ -291,6 +297,11 @@ EOF
     if [ "${pitfttype}" == "28c" ]; then
         cat > /etc/udev/rules.d/95-ft6206.rules <<EOF
         SUBSYSTEM=="input", ATTRS{name}=="ft6x06_ts", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen" 
+EOF
+
+    if [ "${pitfttype}" == "wave32" ] || [ "${pitfttype}" == "wave35" ] || [ "${pitfttype}" == "wave40" ] || [ "${pitfttype}" == "wave50" ]; then
+        cat > /etc/udev/rules.d/95-ADS7846.rules <<EOF
+        SUBSYSTEM=="input", ATTRS{name}=="ADS7846", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen" 
 EOF
     fi
 }

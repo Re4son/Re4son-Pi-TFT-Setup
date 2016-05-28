@@ -4,7 +4,7 @@ A script for configuring TFT displays on a Raspberry Pi. This script is heavily 
 
 This Helper is used in [Sticky Finger's Kali Pi](http://www.whitedome.com.au/kali-pi).
 
-## PiTFT Documentation
+## TFT Documentation
 
 Products:
 The following products are fully supported:
@@ -76,6 +76,8 @@ For a full list of available options, check the help:
 re4son-pi-tft-helper -h
 ```
 
+## Updating Re4son-Pi-TFT-Helper
+
 To reset all settings, just run:
 
 ```sh
@@ -85,4 +87,23 @@ rm /etc/X11/xorg.conf.d/99-fbdev.conf
 rm /etc/X11/xorg.conf.d/99-calibration.conf
 rm /etc/pointercal
 rm /dev/input/touchscreen
+```
+
+I you use "re4son-pi-tft-setup" that came with the awesome Re4son's Kali-Pi TFT kernel available here:
+
+[Re4son's Kali-Pi TFT Kernel with wifi injection patch](http://whitedome.com.au/download/Kali-Pi-Kernels/re4son_kali-pi-tft_kernel_current.tar.gz)
+
+then just run these commands to update to the latest version:
+
+```sh
+cd /usr/local/src/re4son_kali-pi-tft_kernel_*
+rm re4son-pi-tft-setup
+wget https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/master/re4son-pi-tft-setup
+chmod +x re4son-pi-tft-setup
+```
+
+If you cloned the git repo just go to the "Re4son-Pi-TFT-Setup" directory and run
+
+```sh
+git pull
 ```

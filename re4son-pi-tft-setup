@@ -132,7 +132,7 @@ function update_configtxt() {
     if [ "${pitfttype}" == "35r" ]; then
         overlay="dtoverlay=pitft35r,rotate=90,speed=42000000,fps=20"
     fi
-    
+
     if [ "${pitfttype}" == "elec22" ]; then
         overlay="dtoverlay=elec22"
     fi
@@ -183,7 +183,7 @@ function update_xorg() {
     mkdir -p /etc/X11/xorg.conf.d
 
     cat > /etc/X11/xorg.conf.d/99-fbdev.conf <<EOF
-Section "Device" 
+Section "Device"
   Identifier "myfb"
   Driver "fbdev"
   Option "fbdev" "/dev/fb1"
@@ -295,7 +295,7 @@ EOF
 8 -8432 32432138 5699 -112 -965922 65536
 EOF
     fi
-    
+
     if [ "${pitfttype}" == "wave35" ]; then
         cat > /etc/pointercal <<EOF
 8 -8432 32432138 5699 -112 -965922 65536
@@ -321,7 +321,7 @@ EOF
         SUBSYSTEM=="input", ATTRS{name}=="ft6x06_ts", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen" 
 EOF
     fi
-    
+
     if [ "${pitfttype}" == "wave32" ] || [ "${pitfttype}" == "wave35" ] || [ "${pitfttype}" == "wave40" ] || [ "${pitfttype}" == "wave50" ]; then
         cat > /etc/udev/rules.d/95-ADS7846.rules <<EOF
         SUBSYSTEM=="input", ATTRS{name}=="ADS7846 Touchscreen", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen" 
@@ -385,6 +385,18 @@ EOF
 }
 
 function update_bootprefs() {
+    # check init system (technique borrowed from raspi-config):
+    info PI-TFT 'Checking init system...'
+    if command -v systemctl > /dev/null && systemctl | grep -q '\-\.mount'; then
+      echo "Found systemd"
+      SYSTEMD=1
+    elif [ -f /etc/init.d/cron ] && [ ! -h /etc/init.d/cron ]; then
+      echo "Found sysvinit"
+      SYSTEMD=0
+    else
+      bail "Unrecognised init system"
+    fi
+
     if [ "${boot_pref}" == "cli" ]; then
       echo "Turning off boot-to-desktop"
       if [ -e /etc/init.d/lightdm ]; then
@@ -397,7 +409,7 @@ function update_bootprefs() {
         fi
       fi
     fi
-      
+
     if [ "${boot_pref}" == "gui" ]; then
       echo "Turning on boot-to-desktop"
       if [ -e /etc/init.d/lightdm ]; then
@@ -509,8 +521,8 @@ if [ "${pitfttype}" == "pi70" ]; then
     info PI-TFT "Updating /boot/config.txt to turn the screen around..."
     update_configtxt || bail "Unable to update /boot/config.txt"
 
-    info PI--TFT "Success!"
-    
+    info PI-TFT "Success!"
+
     echo
     read -p "Reboot to apply changes? (y/n): " -n 1 -r
     echo

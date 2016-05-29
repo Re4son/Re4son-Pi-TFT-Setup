@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="1.2.2"
+VERSION="1.2.3"
 
 
 function print_version() {

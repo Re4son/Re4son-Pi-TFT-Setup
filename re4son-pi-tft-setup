@@ -12,13 +12,13 @@ function print_version() {
 }
 
 function update_autologon() {
-    if [ "${user}" = "" ]; then
+    if [ "${usr_name}" = "" ]; then
         info AUTOLOGON "Disabling autologon"
         sed -i 's/ExecStart=-/sbin/agetty -a [^ tab]\+/ExecStart=-/sbin/agetty --noclear/g' "/etc/systemd/system/getty.target.wants/getty@tty1.service"
         info AUTOLOGON "Done!"
     else
         info AUTOLOGON "Enabling autologon for user $user"
-        sed -i "s/ExecStart=-/sbin/agetty --noclear/ExecStart=-/sbin/agetty -a $user/g" "/etc/systemd/system/getty.target.wants/getty@tty1.service"
+        sed -i "s/ExecStart=-/sbin/agetty --noclear/ExecStart=-/sbin/agetty -a $usr_name/g" "/etc/systemd/system/getty.target.wants/getty@tty1.service"
         info AUTOLOGON "Done!"
     fi
 }
@@ -212,7 +212,7 @@ EOF
 
     echo "Moving /etc/X11/xorg.conf.d/99-fbdev.conf to ${target_homedir}"
     mv /etc/X11/xorg.conf.d/99-fbdev.conf "$target_homedir"
-        
+
     if [ "${pitfttype}" == "28r" ]; then
         cat > /etc/X11/xorg.conf.d/99-calibration.conf <<EOF
 Section "InputClass"
@@ -467,7 +467,7 @@ do
             print_version
             ;;
         -a)
-            user="$2"
+            usr_name="$2"
             update_autologon
             ;;
         -d)

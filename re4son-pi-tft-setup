@@ -30,6 +30,9 @@ function print_help() {
     echo "Usage: $0 -t [pitfttype]"
     echo "    -h            Print this help"
     echo "    -v            Print version information"
+    echo "    -b [bootpref] set boot preference:"
+    echo "                    'cli' for boot to command line"
+    echo "                    'gui' for boot to desktop"
     echo "    -d            Update Re4son Pi-TFT Setup"
     echo "    -u [homedir]  Specify path of primary user's home directory (defaults to /home/pi)"
     echo "    -t [type]     Specify the type of TFT:"
@@ -382,16 +385,29 @@ EOF
 }
 
 function update_bootprefs() {
-    echo "Turning off boot-to-desktop"
-    if [ -e /etc/init.d/lightdm ]; then
-      if [ $SYSTEMD -eq 1 ]; then
-        systemctl set-default multi-user.target
-        ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
-      else
-        update-rc.d lightdm disable 2
-        sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"
+    if [ "${boot_pref}" == "cli" ]; then
+      echo "Turning off boot-to-desktop"
+      if [ -e /etc/init.d/lightdm ]; then
+        if [ $SYSTEMD -eq 1 ]; then
+          systemctl set-default multi-user.target
+          ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+        else
+          update-rc.d lightdm disable 2
+          sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"
+        fi
       fi
-    fi
+      
+    if [ "${boot_pref}" == "gui" ]; then
+      echo "Turning on boot-to-desktop"
+      if [ -e /etc/init.d/lightdm ]; then
+        if [ $SYSTEMD -eq 1 ]; then
+          systemctl set-default graphical.target
+          ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+        else
+          update-rc.d lightdm enable 2
+          sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"
+        fi
+      fi
 }
 
 # MAIN
@@ -415,6 +431,10 @@ do
         -d)
             check_update
             ;;
+        -b)
+            boot_pref="$2"
+            update_bootprefs
+            ;;
         -u)
             target_homedir="$2"
             echo "Homedir = ${2}"
@@ -435,7 +455,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # check init system (technique borrowed from raspi-config):
-info PITFT 'Checking init system...'
+info PI-TFT 'Checking init system...'
 if command -v systemctl > /dev/null && systemctl | grep -q '\-\.mount'; then
   echo "Found systemd"
   SYSTEMD=1
@@ -483,10 +503,10 @@ fi
 
 ## 7" Raspbery Pi only requies a little change in the /boot/config.txt then exit
 if [ "${pitfttype}" == "pi70" ]; then
-    info PITFT "Updating /boot/config.txt to turn the screen around..."
+    info PI-TFT "Updating /boot/config.txt to turn the screen around..."
     update_configtxt || bail "Unable to update /boot/config.txt"
 
-    info PITFT "Success!"
+    info PI--TFT "Success!"
     
     echo
     read -p "Reboot to apply changes? (y/n): " -n 1 -r
@@ -497,34 +517,35 @@ if [ "${pitfttype}" == "pi70" ]; then
     exit 0
 fi
 
-info PITFT "Updating X11 default calibration, patched to work in Kali without breaking HDMI..."
+info PI-TFT "Updating X11 default calibration, patched to work in Kali without breaking HDMI..."
 update_xorg || bail "Unable to update /etc/X11/xorg.conf.d/99-calibration.conf"
 
-info PITFT "Updating X11 setup tweaks..."
+info PI-TFT "Updating X11 setup tweaks..."
 update_x11profile || bail "Unable to update X11 setup"
 
-info PITFT "Updating TSLib default calibration..."
+info PI-TFT "Updating TSLib default calibration..."
 update_pointercal || bail "Unable to update /etc/pointercal"
 
-info PITFT "Updating SysFS rules for Touchscreen..."
+info PI-TFT "Updating SysFS rules for Touchscreen..."
 update_udev || bail "Unable to update /etc/udev/rules.d"
 
 # ask for console access
 if ask "Would you like the console to appear on the PiTFT display?"; then
-    info PITFT "Updating console to PiTFT..."
+    info PI--TFT "Updating console to PiTFT..."
     install_console || bail "Unable to configure console"
 else
-    info PITFT "Making sure console doesn't use PiTFT"
+    info PI-TFT "Making sure console doesn't use PiTFT"
     uninstall_console || bail "Unable to configure console"
 fi
 
-info PITFT "Updating /etc/modules..."
+info PI-TFT "Updating /etc/modules..."
 update_etcmodules || bail "Unable to update /etc/modules"
 
 if [ "${pitfttype}" == "28r" ] || [ "${pitfttype}" == "28c" ] || [ "${pitfttype}" == "22" ]; then
     # ask for 'on/off' button
     if ask "Would you like GPIO #23 to act as a on/off button?"; then
-        info PITFT "Adding GPIO #23 on/off to PiTFT..."
+        info PI-
+-TFT "Adding GPIO #23 on/off to PiTFT..."
         install_onoffbutton || bail "Unable to add on/off button"
     fi
 fi
@@ -539,11 +560,11 @@ if [ "${pitfttype}" == "elec22" ] || [ "${pitfttype}" == "jb35" ] || [ "${pitftt
     echo "You can use the xinput-calibrator in the tools directory to calibrate the touch screen."
 fi
 
-info PITFT "Updating /boot/config.txt..."
+info PI-TFT "Updating /boot/config.txt..."
 update_configtxt || bail "Unable to update /boot/config.txt"
 
-info PITFT "Success!"
-info PITFT "Notes:"
+info PI-TFT "Success!"
+info PI-TFT "Notes:"
 echo "Please don't run rpi-update, or you'll have to re-install a kernel"
 echo "with Pi-TFT support.  For more info, see:"
 echo "https://whitedome.com.au/kali-pi"

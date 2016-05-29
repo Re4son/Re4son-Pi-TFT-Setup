@@ -421,6 +421,7 @@ function update_bootprefs() {
           sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"
         fi
       fi
+      mv /etc/X11/xorg.conf.d/99-fbdev.conf ~
     fi
 
     if [ "${boot_pref}" == "gui" ]; then
@@ -434,6 +435,7 @@ function update_bootprefs() {
           sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"
         fi
       fi
+      mv ~/99-fbdev.conf /etc/X11/xorg.conf.d/
     fi
 exit 0;
 }

@@ -1,9 +1,27 @@
 #!/usr/bin/env bash
 
 set -e
+PROG_NAME="$0"
+ARGS="$@"
+VERSION="1.2.0"
+
 
 function print_version() {
-    echo "Re4son Pi-TFT Setup v1.2.0"
+    echo "Re4son Pi-TFT Setup $VERSION"
+    exit 1
+}
+
+function check_update() {
+    TEMP_FILE="/tmp/re4son-pi-tft-setup"
+    echo "downloading update"
+    wget -O ${TEMP_FILE} https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/master/re4son-pi-tft-setup
+    echo "Replacing current version:"
+    echo "Re4son Pi-TFT Setup $VERSION"
+    echo
+    echo "With new version:"
+    $TEMP_FILE -v
+    cp $TEMP_FILE $PROG_NAME
+    echo "Done."
     exit 1
 }
 
@@ -11,6 +29,7 @@ function print_help() {
     echo "Usage: $0 -t [pitfttype]"
     echo "    -h            Print this help"
     echo "    -v            Print version information"
+    echo "    -d            Update Re4son Pi-TFT Setup"
     echo "    -u [homedir]  Specify path of primary user's home directory (defaults to /home/pi)"
     echo "    -t [type]     Specify the type of TFT:"
     echo "                                             '28r'      (Adafruit 2.8\" PID 1601)"
@@ -378,7 +397,7 @@ function update_bootprefs() {
 
 target_homedir="/home/pi"
 
-args=$(getopt -uo 'hvri:t:o:b:u:' -- $*)
+args=$(getopt -uo 'hvdri:t:o:b:u:' -- $*)
 [ $? != 0 ] && print_help
 set -- $args
 
@@ -391,6 +410,9 @@ do
             ;;
         -v)
             print_version
+            ;;
+        -d)
+            check_update
             ;;
         -u)
             target_homedir="$2"

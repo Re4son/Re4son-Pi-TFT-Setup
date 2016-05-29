@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="1.4.3"
+VERSION="1.4.4"
 
 
 function print_version() {
@@ -21,13 +21,6 @@ function update_autologon() {
         sed -i "s/ExecStart=-/sbin/agetty --noclear/ExecStart=-/sbin/agetty -a $usr_name/g" "/etc/systemd/system/getty.target.wants/getty@tty1.service"
         info AUTOLOGON "Done!"
     fi
-}
-
-    echo "Re4son Pi-TFT Setup $VERSION"
-    echo
-    info UPDATE "With new version:"
-    source "$PROG_NAME" -v
-    exit 0
 }
 
 function check_update() {

@@ -21,6 +21,7 @@ function check_update() {
     echo "With new version:"
     $TEMP_FILE -v
     cp $TEMP_FILE $PROG_NAME
+    rm -f $TEMP_FILE
     echo "Done."
     exit 1
 }

@@ -15,17 +15,14 @@ function check_update() {
     TEMP_FILE="/tmp/re4son-pi-tft-setup"
     echo "downloading update"
     wget -O ${TEMP_FILE} https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/master/re4son-pi-tft-setup
-    chmod +x $TEMP_FILE
-    echo "Replacing current version:"
-    echo "Re4son Pi-TFT Setup $VERSION"
-    echo
-    echo "With new version:"
-    $TEMP_FILE -v
     cp $TEMP_FILE $PROG_NAME
     chmod +x $PROG_NAME
     rm -f $TEMP_FILE
-    echo "Done."
-    exit 1
+    echo "Replaced old version:"
+    echo "Re4son Pi-TFT Setup $VERSION"
+    echo
+    echo "With new version:"
+    source "$PROG_NAME" -v
 }
 
 function print_help() {

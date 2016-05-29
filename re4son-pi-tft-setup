@@ -8,7 +8,7 @@ VERSION="1.3.0"
 
 function print_version() {
     echo "Re4son Pi-TFT Setup $VERSION"
-    exit 1
+    exit 0
 }
 
 function check_update() {
@@ -23,7 +23,7 @@ function check_update() {
     echo
     info UPDATE "With new version:"
     source "$PROG_NAME" -v
-    exit 1
+    exit 0
 }
 
 function print_help() {
@@ -410,6 +410,7 @@ function update_bootprefs() {
         fi
       fi
     fi
+exit 0;
 }
 
 # MAIN

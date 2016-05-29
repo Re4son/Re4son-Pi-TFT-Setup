@@ -11,6 +11,25 @@ function print_version() {
     exit 0
 }
 
+function update_autologon() {
+    if [ "${user}" = "" ]; then
+        info AUTOLOGON "Disabling autologon"
+        sed -i 's/ExecStart=-/sbin/agetty -a pi/ExecStart=-/sbin/agetty --noclear/g' "/etc/systemd/system/getty.target.wants/getty@tty1.service"
+        info AUTOLOGON "Done!"
+    else
+        info AUTOLOGON "Enabling autologon for user $user"
+        sed -i 's/ExecStart=-/sbin/agetty --noclear/ExecStart=-/sbin/agetty -a %{user}/g' "/etc/systemd/system/getty.target.wants/getty@tty1.service"
+        info AUTOLOGON "Done!"
+    fi
+}
+
+    echo "Re4son Pi-TFT Setup $VERSION"
+    echo
+    info UPDATE "With new version:"
+    source "$PROG_NAME" -v
+    exit 0
+}
+
 function check_update() {
     TEMP_FILE="/tmp/re4son-pi-tft-setup"
     info UPDATE "Downloading update"
@@ -30,6 +49,7 @@ function print_help() {
     echo "Usage: $0 -t [pitfttype]"
     echo "    -h            Print this help"
     echo "    -v            Print version information"
+    echo "    -a [user]     Enable autologon for [user], leave [user] empty to disable autologon"
     echo "    -b [bootpref] set boot preference:"
     echo "                    'cli' for boot to command line"
     echo "                    'gui' for boot to desktop"
@@ -445,6 +465,10 @@ do
             ;;
         -v)
             print_version
+            ;;
+        -a)
+            user="$2"
+            update_autologon
             ;;
         -d)
             check_update

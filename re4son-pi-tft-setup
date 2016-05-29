@@ -19,10 +19,11 @@ function check_update() {
     chmod +x $PROG_NAME
     rm -f $TEMP_FILE
     info UPDATE "Replaced old version:"
-    info UPDATE "Re4son Pi-TFT Setup $VERSION"
+    echo "Re4son Pi-TFT Setup $VERSION"
     echo
     info UPDATE "With new version:"
-    info UPDATE "$PROG_NAME" -v
+    source "$PROG_NAME" -v
+    exit 1
 }
 
 function print_help() {

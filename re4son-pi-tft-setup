@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="1.4.0"
+VERSION="1.4.1"
 
 
 function print_version() {
@@ -18,7 +18,7 @@ function update_autologon() {
         info AUTOLOGON "Done!"
     else
         info AUTOLOGON "Enabling autologon for user $user"
-        sed -i 's/ExecStart=-/sbin/agetty --noclear/ExecStart=-/sbin/agetty -a %{user}/g' "/etc/systemd/system/getty.target.wants/getty@tty1.service"
+        sed -i 's/ExecStart=-/sbin/agetty --noclear/ExecStart=-/sbin/agetty -a ${user}/g' "/etc/systemd/system/getty.target.wants/getty@tty1.service"
         info AUTOLOGON "Done!"
     fi
 }

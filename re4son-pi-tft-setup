@@ -584,8 +584,7 @@ update_etcmodules || bail "Unable to update /etc/modules"
 if [ "${pitfttype}" == "28r" ] || [ "${pitfttype}" == "28c" ] || [ "${pitfttype}" == "22" ]; then
     # ask for 'on/off' button
     if ask "Would you like GPIO #23 to act as a on/off button?"; then
-        info PI-
--TFT "Adding GPIO #23 on/off to PiTFT..."
+        info PI-TFT "Adding GPIO #23 on/off to PiTFT..."
         install_onoffbutton || bail "Unable to add on/off button"
     fi
 fi

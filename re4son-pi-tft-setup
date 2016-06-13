@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="1.5.5"
+VERSION="1.6.0"
 
 
 function print_version() {
@@ -193,6 +193,13 @@ dtparam=spi=on
 dtparam=i2c1=on
 dtparam=i2c_arm=on
 $overlay
+###########################################
+####  Overclocking the micro sdcard    ####
+#### Uncomment  84 for Raspberry Pi 2  ####
+# dtparam=sd_overclock=84
+#### Uncomment 100 for Raspberry Pi 3  ####
+# dtparam=sd_overclock=100
+###########################################
 # --- end re4son-pi-tft-setup $date ---
 EOF
     fi

@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="1.6.1"
+VERSION="1.6.2"
 
 
 function print_version() {
@@ -339,19 +339,19 @@ EOF
 function update_udev() {
     if [ "${pitfttype}" == "28r" ] || [ "${pitfttype}" == "35r" ]; then
         cat > /etc/udev/rules.d/95-stmpe.rules <<EOF
-        SUBSYSTEM=="input", ATTRS{name}=="stmpe-ts", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
+SUBSYSTEM=="input", ATTRS{name}=="stmpe-ts", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
 EOF
     fi
 
     if [ "${pitfttype}" == "28c" ]; then
         cat > /etc/udev/rules.d/95-ft6206.rules <<EOF
-        SUBSYSTEM=="input", ATTRS{name}=="ft6x06_ts", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen" 
+SUBSYSTEM=="input", ATTRS{name}=="ft6x06_ts", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen" 
 EOF
     fi
 
     if [ "${pitfttype}" == "wave32" ] || [ "${pitfttype}" == "wave35" ] || [ "${pitfttype}" == "wave40" ] || [ "${pitfttype}" == "wave50" ]; then
         cat > /etc/udev/rules.d/95-ADS7846.rules <<EOF
-        SUBSYSTEM=="input", ATTRS{name}=="ADS7846 Touchscreen", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen" 
+SUBSYSTEM=="input", ATTRS{name}=="ADS7846 Touchscreen", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen" 
 EOF
     fi
 }

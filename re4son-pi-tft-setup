@@ -32,7 +32,7 @@ function update_autologon() {
 function check_update() {
     TEMP_FILE="/tmp/re4son-pi-tft-setup"
     info UPDATE "Downloading update"
-    wget -O ${TEMP_FILE} https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/master/re4son-pi-tft-setup
+    wget -O ${TEMP_FILE} https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/rpts-4.4/re4son-pi-tft-setup
     cp $TEMP_FILE $PROG_NAME
     chmod +x $PROG_NAME
     rm -f $TEMP_FILE

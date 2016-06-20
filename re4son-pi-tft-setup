@@ -141,16 +141,17 @@ function update_configtxt() {
     fi
 
     if [ "${pitfttype}" == "28r" ]; then
-        overlay="dtoverlay=pitft28r,rotate=90,speed=64000000,fps=60"
+        overlay="dtoverlay=pitft28r,rotate=90,speed=62000000,fps=60"
     fi
 
     if [ "${pitfttype}" == "28c" ]; then
-        overlay="dtoverlay=pitft28c,rotate=90,speed=64000000,fps=60"
+        overlay="dtoverlay=pitft28c,rotate=90,speed=62000000,fps=60"
     fi
 
     if [ "${pitfttype}" == "35r" ]; then
+      ## overlay="dtoverlay=pitft35r,rotate=90,speed=32000000,fps=20"
       ## overlay="dtoverlay=pitft35r,rotate=90,speed=42000000,fps=20"
-        overlay="dtoverlay=pitft35r,rotate=90,speed=64000000,fps=30"
+        overlay="dtoverlay=pitft35r,rotate=90,speed=62000000,fps=30"
     fi
 
     if [ "${pitfttype}" == "elec22" ]; then

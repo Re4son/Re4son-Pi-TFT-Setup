@@ -363,7 +363,9 @@ function update_x11profile() {
     else
         echo "Adding 'export FRAMEBUFFER=/dev/fb1'"
         cat >> "${target_homedir}/.profile" <<EOF
+# --- added by re4son-pi-tft-setup $date ---
 export FRAMEBUFFER=/dev/fb1
+# --- end re4son-pi-tft-setup $date ---
 EOF
     fi
 }

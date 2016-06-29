@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.1-1.7.3"
+VERSION="4.1-1.8.1"
 
 
 function print_version() {
@@ -12,6 +12,9 @@ function print_version() {
 }
 
 function update_autologon() {
+    if [[ $EUID -ne 0 ]]; then
+        bail "re4son-pi-tft-setup must be run as root. try: sudo re4son-pi-tft-setup"
+    fi
     file="/etc/systemd/system/getty.target.wants/getty@tty1.service"
     exec_line=`grep ExecStart $file`
     if [ "${user_name}" = "disable" ]; then
@@ -30,6 +33,9 @@ function update_autologon() {
 }
 
 function check_update() {
+    if [[ $EUID -ne 0 ]]; then
+        bail "re4son-pi-tft-setup must be run as root. try: sudo re4son-pi-tft-setup"
+    fi
     TEMP_FILE="/tmp/re4son-pi-tft-setup"
     info UPDATE "Downloading update"
     wget -O ${TEMP_FILE} https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/rpts-4.1/re4son-pi-tft-setup
@@ -44,15 +50,47 @@ function check_update() {
     exit 0
 }
 
+function remove_tft() {
+    if [[ $EUID -ne 0 ]]; then
+        bail "re4son-pi-tft-setup must be run as root. try: sudo re4son-pi-tft-setup"
+    fi
+    if grep -q boot /proc/mounts; then
+        echo "/boot is mounted"
+    else
+        echo "/boot must be mounted. if you think it's not, quit here and try: sudo mount /dev/mmcblk0p1 /boot"
+        if ask "Continue?"; then
+            echo "Proceeding."
+        else
+            bail "Aborting."
+        fi
+    fi
+    info UPDATE "Removing TFT configuration"
+    rm -r /etc/X11/xorg.conf.d/99-fbdev.conf
+    rm -r /etc/X11/xorg.conf.d/99-calibration.conf
+    rm -r /etc/pointercal
+    rm -r /dev/input/touchscreen
+    rm -r /etc/udev/rules.d/95-*.rules
+    rm -r ~/99-fbturbo.conf
+    sed -i 's/rootwait fbcon=map:10 fbcon=font:VGA8x8/rootwait/g' "/boot/cmdline.txt"
+    sed -i 's/BLANK_TIME=0/BLANK_TIME=10/g' "/etc/kbd/config"
+    nano /boot/config.txt
+    nano /etc/modules
+    nano ~/.profile
+    info UPDATE "TFT config removed"
+    exit 0
+}
+
 function print_help() {
     echo "Usage: $0 -t [pitfttype]"
     echo "    -h            Print this help"
     echo "    -v            Print version information"
     echo "    -a [user]     Enable autologon for [user], use [user] 'disable' to disable autologon"
-    echo "    -b [bootpref] set boot preference:"
+    echo "    -b [bootpref] Set boot preference:"
     echo "                    'cli' for boot to command line"
     echo "                    'gui' for boot to desktop"
     echo "    -d            Update Re4son Pi-TFT Setup"
+    echo "    -r            Remove TFT configuration."
+    echo "                  Note: ./boot/config.txt will open - remove the \"re4son-pi-tft-setup\" section manually"
     echo "    -u [homedir]  Specify path of primary user's home directory (defaults to /home/pi)"
     echo "    -t [type]     Specify the type of TFT:"
     echo "                                             '28r'      (Adafruit 2.8\" PID 1601)"
@@ -503,6 +541,9 @@ do
             ;;
         -d)
             check_update
+            ;;
+        -r)
+            remove_tft
             ;;
         -b)
             boot_pref="$2"

@@ -52,29 +52,31 @@ slower SD card, so be patient.
 
 Reboot.
 
+## Updating Re4son-Pi-TFT-Setup
+
 This setup tool can be found in the root directory folder of the kernel package.
-To update to the latest version, just run:
+To update it to the latest version, just run:
 
 ```sh
 ./re4son-pi-tft-setup -d
 ```
 
-## Using Re4son-Pi-TFT-Helper
+## Using Re4son-Pi-TFT-Setup
 
 `re4son-pi-tft-helper` must be run with root privileges, and takes a parameter
 specifying the type of TFT to configure.  Invoke it like so:
 
 ```sh
-sudo re4son-pi-tft-helper -t 28r -u /root
+sudo re4son-pi-tft-setup -t 28r -u /root
 ```
 
 For a full list of available options, check the help:
 
 ```sh
-re4son-pi-tft-helper -h
+re4son-pi-tft-setup -h
 ```
 
-## Updating Re4son-Pi-TFT-Helper
+## Removing TFT settings
 
 To reset all settings, just run:
 

@@ -1,8 +1,8 @@
-# Re4son-Pi-TFT-Helper
+# Re4son-Pi-TFT-Setup
 
 A script for configuring TFT displays on a Raspberry Pi. This script is heavily based on Adafruit's PiTFT Helper.
 
-This Helper is used in [Sticky Finger's Kali Pi](http://www.whitedome.com.au/kali-pi).
+This setup tool is used in [Sticky Finger's Kali Pi](http://www.whitedome.com.au/kali-pi).
 
 ## TFT Documentation
 
@@ -28,10 +28,6 @@ The following products are not fully supported yet and need some manually config
 
 
 ## Getting Started: Kernel & Helper Script Installation
-
-**Please be careful!** Installing a new kernel always has the potential to
-leave your Raspberry Pi unbootable.  You should make a backup copy of your SD
-card before trying this, or (even better!) start with a fresh card.
 
 First, make sure /boot is mounted:
 ```sh
@@ -69,7 +65,7 @@ To update to the latest version, just run:
 specifying the type of TFT to configure.  Invoke it like so:
 
 ```sh
-sudo re4son-pi-tft-helper -t 28r
+sudo re4son-pi-tft-helper -t 28r -u /root
 ```
 
 For a full list of available options, check the help:

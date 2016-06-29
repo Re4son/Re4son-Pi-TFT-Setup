@@ -1,6 +1,6 @@
 # Re4son-Pi-TFT-Setup
 
-A script for configuring TFT displays on a Raspberry Pi. This script is heavily based on Adafruit's PiTFT Helper.
+A tool for setting up TFT displays on a Raspberry Pi. This program is heavily based on Adafruit's PiTFT Helper.
 
 This setup tool is used in [Sticky Finger's Kali Pi](http://www.whitedome.com.au/kali-pi).
 

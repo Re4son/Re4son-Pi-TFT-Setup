@@ -65,12 +65,12 @@ function remove_tft() {
         fi
     fi
     info UPDATE "Removing TFT configuration"
-    rm -r /etc/X11/xorg.conf.d/99-fbdev.conf
-    rm -r /etc/X11/xorg.conf.d/99-calibration.conf
-    rm -r /etc/pointercal
-    rm -r /dev/input/touchscreen
-    rm -r /etc/udev/rules.d/95-*.rules
-    rm -r ~/99-fbturbo.conf
+    rm -f /etc/X11/xorg.conf.d/99-fbdev.conf
+    rm -f /etc/X11/xorg.conf.d/99-calibration.conf
+    rm -f /etc/pointercal
+    rm -f /dev/input/touchscreen
+    rm -f /etc/udev/rules.d/95-*.rules
+    rm -f ~/99-fbturbo.conf
     sed -i 's/rootwait fbcon=map:10 fbcon=font:VGA8x8/rootwait/g' "/boot/cmdline.txt"
     sed -i 's/BLANK_TIME=0/BLANK_TIME=10/g' "/etc/kbd/config"
     nano /boot/config.txt

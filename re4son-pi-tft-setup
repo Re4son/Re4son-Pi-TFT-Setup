@@ -29,6 +29,13 @@ function update_autologon() {
     info AUTOLOGON "Old: $exec_line"
     exec_line=`grep ExecStart $file`
     info AUTOLOGON "New: $exec_line"
+    echo
+    read -p "Reboot to apply changes? (y/n): " -n 1 -r
+    echo
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+       reboot
+    fi
     exit 0
 }
 
@@ -81,6 +88,13 @@ function remove_tft() {
     sed -n '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/ d' "/etc/modules"
     sed -n '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/ d' "${target_homedir}/.profile"
     info UPDATE "TFT config removed"
+    echo
+    read -p "Reboot to apply changes? (y/n): " -n 1 -r
+    echo
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+       reboot
+    fi
     exit 0
 }
 
@@ -523,6 +537,13 @@ function update_bootprefs() {
       fi
       mv ~/99-fbdev.conf /etc/X11/xorg.conf.d/
     fi
+    echo
+    read -p "Reboot to apply changes? (y/n): " -n 1 -r
+    echo
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+       reboot
+    fi
 exit 0;
 }
 
@@ -673,8 +694,6 @@ if [ "${pitfttype}" == "28r" ] || [ "${pitfttype}" == "28c" ] || [ "${pitfttype}
         install_onoffbutton || bail "Unable to add on/off button"
     fi
 fi
-
-# update_bootprefs || bail "Unable to set boot preferences"
 
 if [ "${pitfttype}" == "elec22" ] || [ "${pitfttype}" == "jb35" ] || [ "${pitfttype}" == "sain32" ]; then
     echo "Your screen is configured for console use"

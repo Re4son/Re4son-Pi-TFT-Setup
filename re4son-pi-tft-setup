@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.1-1.8.3"
+VERSION="4.1-1.8.5"
 
 
 function print_version() {
@@ -378,6 +378,7 @@ function update_x11profile() {
         echo "Already had 'export FRAMEBUFFER=/dev/fb1'"
     else
         echo "Adding 'export FRAMEBUFFER=/dev/fb1'"
+        date=`date
         cat >> "${target_homedir}/.profile" <<EOF
 # --- added by re4son-pi-tft-setup $date ---
 export FRAMEBUFFER=/dev/fb1
@@ -477,6 +478,7 @@ function install_onoffbutton() {
         echo "Already had rpi_power_switch"
     else
         echo "Adding rpi_power_switch"
+        date=`date
         cat >> /etc/modules <<EOF
 # --- added by re4son-pi-tft-setup $date ---
 rpi_power_switch
@@ -489,6 +491,7 @@ EOF
         echo "Already had rpi_power_switch config"
     else
         echo "Adding rpi_power_switch"
+        date=`date
         cat >> /etc/modprobe.d/re4son.conf <<EOF
 # --- added by re4son-pi-tft-setup $date ---
 options rpi_power_switch gpio_pin=23 mode=0
@@ -584,6 +587,8 @@ do
             ;;
         -r)
             remove_tft
+            shift
+            shift
             ;;
         -t)
             pitfttype="$2"

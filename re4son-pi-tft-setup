@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.1-1.8.7"
+VERSION="4.1-1.8.9"
 
 
 function print_version() {
@@ -58,22 +58,6 @@ function check_update() {
 }
 
 function remove_tft() {
-    if [[ $EUID -ne 0 ]]; then
-        bail "re4son-pi-tft-setup must be run as root. try: sudo re4son-pi-tft-setup"
-    fi
-    if grep -q boot /proc/mounts; then
-        echo "/boot is mounted"
-    else
-        echo "/boot must be mounted. if you think it's not, quit here and try: sudo mount /dev/mmcblk0p1 /boot"
-        if ask "Continue?"; then
-            echo "Proceeding."
-        else
-            bail "Aborting."
-        fi
-    fi
-    if [[ ! -e "$target_homedir" || ! -d "$target_homedir" ]]; then
-        bail "$target_homedir must be an existing directory (use -u /home/foo to specify)"
-    fi
     info UPDATE "Removing TFT configuration"
     rm -f /etc/X11/xorg.conf.d/99-fbdev.conf
     rm -f /etc/X11/xorg.conf.d/99-calibration.conf
@@ -84,9 +68,9 @@ function remove_tft() {
     rm -f /etc/modprobe.d/re4son.conf
     sed -i 's/rootwait fbcon=map:10 fbcon=font:VGA8x8/rootwait/g' "/boot/cmdline.txt"
     sed -i 's/BLANK_TIME=0/BLANK_TIME=10/g' "/etc/kbd/config"
-    sed -n '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/ d' "/boot/config.txt"
-    sed -n '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/ d' "/etc/modules"
-    sed -n '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/ d' "${target_homedir}/.profile"
+    sed -i '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/d' "/boot/config.txt"
+    sed -i '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/d' "/etc/modules"
+    sed -i '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/d' "${target_homedir}/.profile"
     info UPDATE "TFT config removed"
     echo
     read -p "Reboot to apply changes? (y/n): " -n 1 -r
@@ -423,7 +407,7 @@ EOF
 
     if [ "${pitfttype}" == "28c" ]; then
         cat > /etc/udev/rules.d/95-ft6206.rules <<EOF
-SUBSYSTEM=="input", ATTRS{name}=="ft6x06_ts", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen" 
+SUBSYSTEM=="input", ATTRS{name}=="ft6x06_ts", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
 EOF
     fi
     if [ "${pitfttype}" == "hy28b" ]; then
@@ -434,7 +418,7 @@ EOF
 
     if [ "${pitfttype}" == "wave32" ] || [ "${pitfttype}" == "wave35" ] || [ "${pitfttype}" == "sain35" ] || [ "${pitfttype}" == "wave40" ] || [ "${pitfttype}" == "wave50" ]; then
         cat > /etc/udev/rules.d/95-ADS7846.rules <<EOF
-SUBSYSTEM=="input", ATTRS{name}=="ADS7846 Touchscreen", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen" 
+SUBSYSTEM=="input", ATTRS{name}=="ADS7846 Touchscreen", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
 EOF
     fi
 }
@@ -554,7 +538,7 @@ exit 0;
 
 target_homedir="/home/pi"
 
-args=$(getopt -uo 'hvdi:a:r:t:o:b:u:' -- $*)
+args=$(getopt -uo 'hvdria:t:o:b:u:' -- $*)
 [ $? != 0 ] && print_help
 set -- $args
 
@@ -575,6 +559,10 @@ do
         -d)
             check_update
             ;;
+        -r)
+            removetft="YES"
+            shift
+            ;;
         -b)
             boot_pref="$2"
             update_bootprefs
@@ -582,11 +570,6 @@ do
         -u)
             target_homedir="$2"
             echo "Homedir = ${2}"
-            shift
-            shift
-            ;;
-        -r)
-            remove_tft
             shift
             shift
             ;;
@@ -628,6 +611,10 @@ fi
 
 if [[ ! -e "$target_homedir" || ! -d "$target_homedir" ]]; then
     bail "$target_homedir must be an existing directory (use -u /home/foo to specify)"
+fi
+
+if [ "${removetft}" == "YES" ]; then
+    remove_tft || bail "Unable to remove tft configuration"
 fi
 
 if [ "${pitfttype}" != "28r" ] && [ "${pitfttype}" != "28c" ] && [ "${pitfttype}" != "35r" ] && [ "${pitfttype}" != "22" ] && [ "${pitfttype}" != "elec22" ] && [ "${pitfttype}" != "hy28b" ] && [ "${pitfttype}" != "jb35" ] && [ "${pitfttype}" != "pi70" ] && [ "${pitfttype}" != "sain32" ] && [ "${pitfttype}" != "sain35" ] && [ "${pitfttype}" != "wave32" ] && [ "${pitfttype}" != "wave35" ] && [ "${pitfttype}" != "wave40" ] && [ "${pitfttype}" != "wave50" ]; then

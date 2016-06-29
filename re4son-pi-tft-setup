@@ -90,7 +90,7 @@ function print_help() {
     echo "                    'gui' for boot to desktop"
     echo "    -d            Update Re4son Pi-TFT Setup"
     echo "    -r            Remove TFT configuration."
-    echo "                  Note: ./boot/config.txt will open - remove the \"re4son-pi-tft-setup\" section manually"
+    echo "                  Note: some files will open in a text editor for manual removal of entries"
     echo "    -u [homedir]  Specify path of primary user's home directory (defaults to /home/pi)"
     echo "    -t [type]     Specify the type of TFT:"
     echo "                                             '28r'      (Adafruit 2.8\" PID 1601)"

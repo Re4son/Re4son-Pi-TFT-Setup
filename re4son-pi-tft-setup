@@ -71,6 +71,7 @@ function remove_tft() {
     rm -f /dev/input/touchscreen
     rm -f /etc/udev/rules.d/95-*.rules
     rm -f ~/99-fbturbo.conf
+    rm -f /etc/modprobe.d/re4son.conf
     sed -i 's/rootwait fbcon=map:10 fbcon=font:VGA8x8/rootwait/g' "/boot/cmdline.txt"
     sed -i 's/BLANK_TIME=0/BLANK_TIME=10/g' "/etc/kbd/config"
     nano /boot/config.txt
@@ -459,7 +460,9 @@ function install_onoffbutton() {
     else
         echo "Adding rpi_power_switch"
         cat >> /etc/modules <<EOF
+# --- added by re4son-pi-tft-setup $date ---
 rpi_power_switch
+# --- end re4son-pi-tft-setup $date ---
 EOF
     fi
 
@@ -469,7 +472,9 @@ EOF
     else
         echo "Adding rpi_power_switch"
         cat >> /etc/modprobe.d/re4son.conf <<EOF
+# --- added by re4son-pi-tft-setup $date ---
 options rpi_power_switch gpio_pin=23 mode=0
+# --- end re4son-pi-tft-setup $date ---
 EOF
     fi
 }

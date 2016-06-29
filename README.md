@@ -27,7 +27,7 @@ The following products are not fully supported yet and need some manually config
 
 
 
-## Getting Started: Kernel & Helper Script Installation
+## Getting Started: Kernel & Setup Tool Installation
 
 First, make sure /boot is mounted:
 ```sh

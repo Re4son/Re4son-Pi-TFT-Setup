@@ -437,6 +437,11 @@ function install_console() {
     else
         echo "/boot/cmdline.txt already updated"
     fi
+    if [ ! -f /etc/kbd/config ]; then
+        echo "Creating /etc/kbd/config"
+        mkdir -p /etc/kbd
+        touch /etc/kbd/config
+    fi
     sed -i 's/BLANK_TIME=.*/BLANK_TIME=0/g' "/etc/kbd/config"
 }
 

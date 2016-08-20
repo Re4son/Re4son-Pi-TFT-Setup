@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.1-1.10.2"
+VERSION="4.1-1.10.3"
 
 
 function print_version() {
@@ -65,6 +65,8 @@ function remove_tft() {
     rm -f /dev/input/touchscreen
     rm -f /etc/udev/rules.d/95-*.rules
     rm -f ${target_homedir}/99-fbturbo.conf
+    rm -f ${target_homedir}/99-fbdev.conf
+    rm -f ~/99-fbdev.conf
     rm -f /etc/modprobe.d/re4son.conf
     sed -i 's/rootwait fbcon=map:10 fbcon=font:VGA8x8/rootwait/g' "/boot/cmdline.txt"
     sed -i 's/BLANK_TIME=0/BLANK_TIME=10/g' "/etc/kbd/config"
@@ -512,6 +514,7 @@ function update_bootprefs() {
 
     if [ "${boot_pref}" == "cli" ]; then
       echo "Turning off boot-to-desktop"
+      mv -f /etc/X11/xorg.conf.d/99-fbdev.conf ~
       if [ -e /etc/init.d/lightdm ]; then
         if [ $SYSTEMD -eq 1 ]; then
           systemctl set-default multi-user.target
@@ -521,11 +524,11 @@ function update_bootprefs() {
           sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"
         fi
       fi
-      mv /etc/X11/xorg.conf.d/99-fbdev.conf ~
     fi
 
     if [ "${boot_pref}" == "gui" ]; then
       echo "Turning on boot-to-desktop"
+      mv -f ~/99-fbdev.conf /etc/X11/xorg.conf.d/
       if [ -e /etc/init.d/lightdm ]; then
         if [ $SYSTEMD -eq 1 ]; then
           systemctl set-default graphical.target
@@ -535,7 +538,6 @@ function update_bootprefs() {
           sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"
         fi
       fi
-      mv ~/99-fbdev.conf /etc/X11/xorg.conf.d/
     fi
     echo
     read -p "Reboot to apply changes? (y/n): " -n 1 -r

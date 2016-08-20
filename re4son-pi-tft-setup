@@ -514,7 +514,7 @@ function update_bootprefs() {
 
     if [ "${boot_pref}" == "cli" ]; then
       echo "Turning off boot-to-desktop"
-      mv -f /etc/X11/xorg.conf.d/99-fbdev.conf ~
+      mv -f /etc/X11/xorg.conf.d/99-fbdev.conf ~ 2> /dev/null
       if [ -e /etc/init.d/lightdm ]; then
         if [ $SYSTEMD -eq 1 ]; then
           systemctl set-default multi-user.target
@@ -528,7 +528,7 @@ function update_bootprefs() {
 
     if [ "${boot_pref}" == "gui" ]; then
       echo "Turning on boot-to-desktop"
-      mv -f ~/99-fbdev.conf /etc/X11/xorg.conf.d/
+      mv -f ~/99-fbdev.conf /etc/X11/xorg.conf.d/ 2> /dev/null
       if [ -e /etc/init.d/lightdm ]; then
         if [ $SYSTEMD -eq 1 ]; then
           systemctl set-default graphical.target

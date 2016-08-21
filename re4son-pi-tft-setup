@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.1-1.11.1"
+VERSION="4.1-1.11.2"
 
 
 function print_version() {
@@ -505,6 +505,9 @@ function update_bootprefs() {
     if command -v systemctl > /dev/null && systemctl | grep -q '\-\.mount'; then
       echo "Found systemd"
       SYSTEMD=1
+      set +e
+      set -bm
+      trap 'if [[ $? -eq 139 ]]; then info PI-TFT "Segfault can be ignored"; fi' CHLD
     elif [ -f /etc/init.d/cron ] && [ ! -h /etc/init.d/cron ]; then
       echo "Found sysvinit"
       SYSTEMD=0
@@ -517,12 +520,13 @@ function update_bootprefs() {
       mv -f /etc/X11/xorg.conf.d/99-fbdev.conf ~ 2> /dev/null
       if [ -e /etc/init.d/lightdm ]; then
         if [ $SYSTEMD -eq 1 ]; then
-          ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
           systemctl set-default multi-user.target
+          ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
         else
           update-rc.d lightdm disable 2
           sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"
         fi
+        info PI-TFT "Success"
       fi
     fi
 
@@ -531,12 +535,13 @@ function update_bootprefs() {
       mv -f ~/99-fbdev.conf /etc/X11/xorg.conf.d/ 2> /dev/null
       if [ -e /etc/init.d/lightdm ]; then
         if [ $SYSTEMD -eq 1 ]; then
-          ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
           systemctl set-default graphical.target
+          ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
         else
           update-rc.d lightdm enable 2
           sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"
         fi
+        info PI-TFT "Success"
       fi
     fi
     echo

@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.1-1.11.2"
+VERSION="4.1-1.11.3"
 
 
 function print_version() {
@@ -358,6 +358,13 @@ Section "InputClass"
         Option  "SwapAxes"      "0"
 EndSection
 EOF
+    fi
+    
+    libinput_path="/usr/share/X11/xorg.conf.d/60-libinput.conf"
+    if [ -e $libinput_path ]; then
+        info PI-TFT "Applying Neto calibration patch:"
+        echo Moving ${libinput_path} to ${target_homedir}"
+        mv "$libinput_path" "$target_homedir"
     fi
 }
 

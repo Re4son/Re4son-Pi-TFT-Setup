@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.1-1.11.3"
+VERSION="4.1-1.11.4"
 
 
 function print_version() {
@@ -73,6 +73,9 @@ function remove_tft() {
     sed -i '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/d' "/boot/config.txt"
     sed -i '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/d' "/etc/modules"
     sed -i '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/d' "${target_homedir}/.profile"
+    if [ -e ${target_homedir}/60-libinput.conf ]; then
+        mv ${target_homedir}/60-libinput.conf /usr/share/X11/xorg.conf.d/
+    fi
     info UPDATE "TFT config removed"
     echo
     read -p "Reboot to apply changes? (y/n): " -n 1 -r

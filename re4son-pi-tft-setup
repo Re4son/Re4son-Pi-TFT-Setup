@@ -366,7 +366,7 @@ EOF
     libinput_path="/usr/share/X11/xorg.conf.d/60-libinput.conf"
     if [ -e $libinput_path ]; then
         info PI-TFT "Applying Neto calibration patch:"
-        echo Moving ${libinput_path} to ${target_homedir}"
+        echo "Moving ${libinput_path} to ${target_homedir}/.60-libinput.conf.bak"
         mv "$libinput_path" ${target_homedir}/.60-libinput.conf.bak
     fi
 }

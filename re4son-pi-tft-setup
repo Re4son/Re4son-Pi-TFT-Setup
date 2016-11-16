@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.1-1.11.5"
+VERSION="4.4-1.11.5"
 
 
 function print_version() {
@@ -45,7 +45,7 @@ function check_update() {
     fi
     TEMP_FILE="/tmp/re4son-pi-tft-setup"
     info UPDATE "Downloading update"
-    wget -O ${TEMP_FILE} https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/rpts-4.1/re4son-pi-tft-setup
+    wget -O ${TEMP_FILE} https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/rpts-4.4/re4son-pi-tft-setup
     cp $TEMP_FILE $PROG_NAME
     chmod +x $PROG_NAME
     rm -f $TEMP_FILE
@@ -189,17 +189,17 @@ function update_configtxt() {
     fi
 
     if [ "${pitfttype}" == "28r" ]; then
-        overlay="dtoverlay=pitft28r,rotate=90,speed=62000000,fps=60"
+        overlay="dtoverlay=pitft28-resistive,rotate=90,speed=62000000,fps=60"
     fi
 
     if [ "${pitfttype}" == "28c" ]; then
-        overlay="dtoverlay=pitft28c,rotate=90,speed=62000000,fps=60"
+        overlay="dtoverlay=pitft28-capacitive,rotate=90,speed=62000000,fps=60"
     fi
 
     if [ "${pitfttype}" == "35r" ]; then
       ## overlay="dtoverlay=pitft35r,rotate=90,speed=32000000,fps=20"
       ## overlay="dtoverlay=pitft35r,rotate=90,speed=42000000,fps=20"
-        overlay="dtoverlay=pitft35r,rotate=90,speed=62000000,fps=30"
+        overlay="dtoverlay=pitft35-resistive,rotate=270,speed=62000000,fps=30"
     fi
 
     if [ "${pitfttype}" == "elec22" ]; then

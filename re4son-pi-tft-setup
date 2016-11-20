@@ -193,7 +193,7 @@ function update_configtxt() {
     fi
 
     if [ "${pitfttype}" == "28c" ]; then
-        overlay="dtoverlay=pitft28-capacitive,rotate=90,speed=62000000,fps=60"
+        overlay="dtoverlay=pitft28c,rotate=90,speed=62000000,fps=60"
     fi
 
     if [ "${pitfttype}" == "35r" ]; then

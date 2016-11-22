@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.1-1.11.5"
+VERSION="4.1-1.11.6"
 
 
 function print_version() {
@@ -477,7 +477,12 @@ function update_etcmodules() {
         echo "Already had $ts_module"
     else
         echo "Adding $ts_module"
-        echo "$ts_module" >> /etc/modules
+        date=`date`
+        cat >> /etc/modules <<EOF
+# --- added by re4son-pi-tft-setup $date ---
+$ts_module
+# --- end re4son-pi-tft-setup $date ---
+EOF
     fi
 }
 

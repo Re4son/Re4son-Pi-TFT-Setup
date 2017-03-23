@@ -185,6 +185,7 @@ function install_xserver-xorg-input-evdev {
         apt install xserver-xorg-input-evdev
     fi
     if [ ! -f /usr/share/X11/xorg.conf.d/45-evdev.conf ]; then
+            echo "Creating /usr/share/X11/xorg.conf.d/45-evdev.conf"
             ln -s /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
     fi
     echo "**** xserver-xorg-input-evdev package installed ****"
@@ -757,10 +758,6 @@ info PI-TFT "Installing dependencies..."
 install_xserver-xorg-input-evdev
 
 info PI-TFT "Success!"
-info PI-TFT "Notes:"
-echo "Please don't run rpi-update, or you'll have to re-install a kernel"
-echo "with Pi-TFT support.  For more info, see:"
-echo "https://whitedome.com.au/kali-pi"
 echo
 echo
 read -p "Reboot to apply changes? (y/n): " -n 1 -r

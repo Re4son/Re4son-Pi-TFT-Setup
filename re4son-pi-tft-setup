@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.4-1.11.6"
+VERSION="4.4-1.11.7"
 
 
 function print_version() {
@@ -171,6 +171,19 @@ function ask() {
             N*|n*) return 1 ;;
         esac
     done
+}
+
+function install_xserver-xorg-input-evdev {
+    echo "Checking for xserver-xorg-input-evdev:" $PKG_STATUS
+    PKG_STATUS=$(dpkg-query -W --showformat='${Status}\n' xserver-xorg-input-evdev|grep "install ok installed")
+        if [ "" == "$PKG_STATUS" ]; then
+        echo "**** Installing xserver-xorg-input-evdev package ****"
+        echo "No xserver-xorg-input-evdev. Installing it now."
+        apt update
+        apt install xserver-xorg-input-evdev
+        mv /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
+    fi
+    echo "**** xserver-xorg-input-evdev package installed ****"
 }
 
 # update /boot/config.txt with appropriate values
@@ -734,6 +747,9 @@ fi
 
 info PI-TFT "Updating /boot/config.txt..."
 update_configtxt || bail "Unable to update /boot/config.txt"
+
+info PI-TFT "Installing dependencies..."
+install_xserver-xorg-input-evdev
 
 info PI-TFT "Success!"
 info PI-TFT "Notes:"

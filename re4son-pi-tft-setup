@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.4-1.11.7"
+VERSION="4.4-1.11.8"
 
 
 function print_version() {
@@ -181,7 +181,7 @@ function install_xserver-xorg-input-evdev {
         echo "No xserver-xorg-input-evdev. Installing it now."
         apt update
         apt install xserver-xorg-input-evdev
-        mv /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
+        ln -s /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
     fi
     echo "**** xserver-xorg-input-evdev package installed ****"
 }

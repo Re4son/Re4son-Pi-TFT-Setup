@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.4-1.11.8"
+VERSION="4.4-1.12.1"
 
 
 function print_version() {
@@ -174,16 +174,20 @@ function ask() {
 }
 
 function install_xserver-xorg-input-evdev {
-    echo "Checking for xserver-xorg-input-evdev:" $PKG_STATUS
+    set +e
+    echo "Checking for xserver-xorg-input-evdev:"
     PKG_STATUS=$(dpkg-query -W --showformat='${Status}\n' xserver-xorg-input-evdev|grep "install ok installed")
         if [ "" == "$PKG_STATUS" ]; then
-        echo "**** Installing xserver-xorg-input-evdev package ****"
-        echo "No xserver-xorg-input-evdev. Installing it now."
-        apt update
-        apt install xserver-xorg-input-evdev
-        ln -s /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
-    fi
+            echo "**** Installing xserver-xorg-input-evdev package ****"
+            echo "No xserver-xorg-input-evdev. Installing it now."
+            apt update
+            apt install xserver-xorg-input-evdev
+            if [ ! -f /usr/share/X11/xorg.conf.d/45-evdev.conf ]; then
+                ln -s /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
+            fi
+        fi
     echo "**** xserver-xorg-input-evdev package installed ****"
+    set -e
 }
 
 # update /boot/config.txt with appropriate values

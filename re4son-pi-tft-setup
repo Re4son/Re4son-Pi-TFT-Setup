@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.4-1.12.2"
+VERSION="4.4-1.12.3"
 
 
 function print_version() {
@@ -113,6 +113,7 @@ function print_help() {
     echo "                                             'wave32'   (Waveshare 3.2\")"
     echo "                                             'wave35'   (Waveshare 3.5\")"
     echo "                                             'wave35o'  (Waveshare 3.5\" Overclocked)"
+    echo "                                             'wave35c'  (Waveshare 3.5\" Clone - Try this for clones when wave35 fails)"
     echo "                                             'wave40'   (Waveshare 4\")"
     echo "                                             'wave50'   (Waveshare 5\" HDMI)"
     echo
@@ -671,7 +672,7 @@ if [ "${removetft}" == "YES" ]; then
     remove_tft || bail "Unable to remove tft configuration"
 fi
 
-if [ "${pitfttype}" != "28r" ] && [ "${pitfttype}" != "28c" ] && [ "${pitfttype}" != "35r" ] && [ "${pitfttype}" != "22" ] && [ "${pitfttype}" != "elec22" ] && [ "${pitfttype}" != "hy28b" ] && [ "${pitfttype}" != "jb35" ] && [ "${pitfttype}" != "kum35" ] && [ "${pitfttype}" != "pi70" ] && [ "${pitfttype}" != "sain32" ] && [ "${pitfttype}" != "sain35" ] && [ "${pitfttype}" != "wave32" ] && [ "${pitfttype}" != "wave35" ] && [ "${pitfttype}" != "wave35o" ] && [ "${pitfttype}" != "wave40" ] && [ "${pitfttype}" != "wave50" ]; then
+if [ "${pitfttype}" != "28r" ] && [ "${pitfttype}" != "28c" ] && [ "${pitfttype}" != "35r" ] && [ "${pitfttype}" != "22" ] && [ "${pitfttype}" != "elec22" ] && [ "${pitfttype}" != "hy28b" ] && [ "${pitfttype}" != "jb35" ] && [ "${pitfttype}" != "kum35" ] && [ "${pitfttype}" != "pi70" ] && [ "${pitfttype}" != "sain32" ] && [ "${pitfttype}" != "sain35" ] && [ "${pitfttype}" != "wave32" ] && [ "${pitfttype}" != "wave35" ] && [ "${pitfttype}" != "wave35o" ] && [ "${pitfttype}" != "wave35c" ] && [ "${pitfttype}" != "wave40" ] && [ "${pitfttype}" != "wave50" ]; then
     echo "Type must be one of:"
     echo "  '28r'      (Adafruit 2.8\" resistive, PID 1601)"
     echo "  '28c'      (Adafruit 2.8\" capacitive, PID 1983)"
@@ -686,7 +687,8 @@ if [ "${pitfttype}" != "28r" ] && [ "${pitfttype}" != "28c" ] && [ "${pitfttype}
     echo "  'sain35'   (Sainsmart 3.2\")"
     echo "  'wave32'   (Waveshare 3.2\")"
     echo "  'wave35'   (Waveshare 3.5\")"
-    echo "  'wave35o'   (Waveshare 3.5\" Overclocked)"
+    echo "  'wave35o'  (Waveshare 3.5\" Overclocked)"
+    echo "  'wave35c'  (Waveshare 3.5\" Clone - Try this for clones when wave35 fails)"
     echo "  'wave40'   (Waveshare 4\")"
     echo "  'wave50'   (Waveshare 5\" HDMI)"
     echo
@@ -709,6 +711,10 @@ if [ "${pitfttype}" == "pi70" ]; then
         reboot
     fi
     exit 0
+fi
+
+if [ "${pitfttype}" == "wave35c" ]; then
+    pitfttype=kum35
 fi
 
 info PI-TFT "Updating X11 default calibration"

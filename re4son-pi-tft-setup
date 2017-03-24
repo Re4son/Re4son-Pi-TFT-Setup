@@ -178,19 +178,19 @@ function ask() {
 function install_xserver-xorg-input-evdev {
 ## Debian releases after early 2017 break touch input - this will fix it
     set +e
-    echo "Checking for xserver-xorg-input-evdev:"
+    info PI-TFT "Checking for xserver-xorg-input-evdev:"
     PKG_STATUS=$(dpkg-query -W --showformat='${Status}\n' xserver-xorg-input-evdev|grep "install ok installed")
     if [ "" == "$PKG_STATUS" ]; then
-        echo "**** Installing xserver-xorg-input-evdev package ****"
-        echo "No xserver-xorg-input-evdev. Installing it now."
+        info PI-TFT "**** Installing xserver-xorg-input-evdev package ****"
+        info PI-TFT "No xserver-xorg-input-evdev. Installing it now."
         apt update
         apt install xserver-xorg-input-evdev
     fi
     if [ ! -f /usr/share/X11/xorg.conf.d/45-evdev.conf ]; then
-            echo "Creating /usr/share/X11/xorg.conf.d/45-evdev.conf"
+            info PI-TFT "Creating /usr/share/X11/xorg.conf.d/45-evdev.conf"
             ln -s /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
     fi
-    echo "**** xserver-xorg-input-evdev package installed ****"
+    info PI-TFT "**** xserver-xorg-input-evdev package installed ****"
     set -e
 }
 
@@ -625,13 +625,13 @@ do
             ;;
         -d)
             target_homedir="$2"
-            echo "Homedir = ${2}"
+            info PI-TFT "Homedir = ${2}"
             shift
             shift
             ;;
         -t)
             pitfttype="$2"
-            echo "Type = ${2}"
+            info PI-TFT "Type = ${2}"
             shift
             shift
             ;;
@@ -645,21 +645,21 @@ fi
 # check init system (technique borrowed from raspi-config):
 info PI-TFT 'Checking init system...'
 if command -v systemctl > /dev/null && systemctl | grep -q '\-\.mount'; then
-  echo "Found systemd"
+  info PI-TFT "Found systemd"
   SYSTEMD=1
 elif [ -f /etc/init.d/cron ] && [ ! -h /etc/init.d/cron ]; then
-  echo "Found sysvinit"
+  info PI-TFT "Found sysvinit"
   SYSTEMD=0
 else
   bail "Unrecognised init system"
 fi
 
 if grep -q boot /proc/mounts; then
-    echo "/boot is mounted"
+    info PI-TFT "/boot is mounted"
 else
     echo "/boot must be mounted. if you think it's not, quit here and try: sudo mount /dev/mmcblk0p1 /boot"
     if ask "Continue?"; then
-        echo "Proceeding."
+        info PI-TFT "Proceeding."
     else
         bail "Aborting."
     fi

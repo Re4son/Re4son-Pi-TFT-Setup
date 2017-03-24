@@ -95,9 +95,9 @@ function print_help() {
     echo "    -b [bootpref] Set boot preference:"
     echo "                    'cli' for boot to command line"
     echo "                    'gui' for boot to desktop"
-    echo "    -d            Update Re4son Pi-TFT Setup"
+    echo "    -u            Update Re4son Pi-TFT Setup"
     echo "    -r            Remove TFT configuration (undo setup)"
-    echo "    -u [homedir]  Specify path of primary user's home directory (defaults to /home/pi)"
+    echo "    -d [dir]      Specify path of user's home directory to save away some files (defaults to /home/pi)"
     echo "    -t [type]     Specify the type of TFT:"
     echo "                                             '28r'      (Adafruit 2.8\" PID 1601)"
     echo "                                             '28c'      (Adafruit 2.8\" PID 1983)"
@@ -611,7 +611,7 @@ do
             user_name="$2"
             update_autologon
             ;;
-        -d)
+        -u)
             check_update
             ;;
         -r)
@@ -622,7 +622,7 @@ do
             boot_pref="$2"
             update_bootprefs
             ;;
-        -u)
+        -d)
             target_homedir="$2"
             echo "Homedir = ${2}"
             shift

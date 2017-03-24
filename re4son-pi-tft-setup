@@ -466,13 +466,13 @@ EOF
 
 function install_console() {
     if ! grep -q 'fbcon=map:10 fbcon=font:VGA8x8' /boot/cmdline.txt; then
-        echo "Updating /boot/cmdline.txt"
+        info PI-TFT "Updating /boot/cmdline.txt"
         sed -i 's/rootwait/rootwait fbcon=map:10 fbcon=font:VGA8x8/g' "/boot/cmdline.txt"
     else
-        echo "/boot/cmdline.txt already updated"
+        info PI-TFT "/boot/cmdline.txt already updated"
     fi
     if [ ! -f /etc/kbd/config ]; then
-        echo "Creating /etc/kbd/config"
+        info PI-TFT "Creating /etc/kbd/config"
         mkdir -p /etc/kbd
         touch /etc/kbd/config
     fi
@@ -482,7 +482,7 @@ function install_console() {
 function uninstall_console() {
     sed -i 's/rootwait fbcon=map:10 fbcon=font:VGA8x8/rootwait/g' "/boot/cmdline.txt"
     sed -i 's/BLANK_TIME=0/BLANK_TIME=10/g' "/etc/kbd/config"
-    echo "Screen blanking time reset to 10 minutes"
+    info PI-TFT "Screen blanking time reset to 10 minutes"
 }
 
 function update_etcmodules() {
@@ -495,9 +495,9 @@ function update_etcmodules() {
     fi
 
     if grep -xq "$ts_module" "/etc/modules"; then
-        echo "Already had $ts_module"
+        info PI-TFT "Already had $ts_module"
     else
-        echo "Adding $ts_module"
+        info PI-TFT "Adding $ts_module"
         date=`date`
         cat >> /etc/modules <<EOF
 # --- added by re4son-pi-tft-setup $date ---
@@ -523,9 +523,9 @@ EOF
 
     echo "Adding rpi_power_switch config to /etc/modprobe.d/re4son.conf"
     if grep -xq "options rpi_power_switch gpio_pin=23 mode=0" "${chr}/etc/modprobe.d/re4son.conf"; then
-        echo "Already had rpi_power_switch config"
+        info PI-TFT "Already had rpi_power_switch config"
     else
-        echo "Adding rpi_power_switch"
+        info PI-TFT "Adding rpi_power_switch"
         date=`date`
         cat >> /etc/modprobe.d/re4son.conf <<EOF
 # --- added by re4son-pi-tft-setup $date ---

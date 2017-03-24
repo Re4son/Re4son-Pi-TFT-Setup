@@ -68,6 +68,7 @@ function remove_tft() {
     rm -f ${target_homedir}/99-fbdev.conf
     rm -f ~/99-fbdev.conf
     rm -f /etc/modprobe.d/re4son.conf
+    rm -f /usr/share/X11/xorg.conf.d/45-evdev.conf
     sed -i 's/rootwait fbcon=map:10 fbcon=font:VGA8x8/rootwait/g' "/boot/cmdline.txt"
     sed -i 's/BLANK_TIME=0/BLANK_TIME=10/g' "/etc/kbd/config"
     sed -i '/added by re4son-pi-tft-setup/,/end re4son-pi-tft-setup/d' "/boot/config.txt"
@@ -97,7 +98,7 @@ function print_help() {
     echo "                    'gui' for boot to desktop"
     echo "    -u            Update Re4son Pi-TFT Setup"
     echo "    -r            Remove TFT configuration (undo setup)"
-    echo "    -d [dir]      Specify path of user's home directory to save away some files (defaults to /home/pi)"
+    echo "    -d [dir]      Specify path of user's home directory to back up and restore some files (defaults to /home/pi)"
     echo "    -t [type]     Specify the type of TFT:"
     echo "                                             '28r'      (Adafruit 2.8\" PID 1601)"
     echo "                                             '28c'      (Adafruit 2.8\" PID 1983)"
@@ -593,7 +594,7 @@ exit 0;
 
 target_homedir="/home/pi"
 
-args=$(getopt -uo 'hvdria:t:o:b:u:' -- $*)
+args=$(getopt -uo 'hvuria:t:o:b:d:' -- $*)
 [ $? != 0 ] && print_help
 set -- $args
 
@@ -665,7 +666,7 @@ else
 fi
 
 if [[ ! -e "$target_homedir" || ! -d "$target_homedir" ]]; then
-    bail "$target_homedir must be an existing directory (use -u /home/foo to specify)"
+    bail "$target_homedir must be an existing directory (use -d /home/foo to specify)"
 fi
 
 if [ "${removetft}" == "YES" ]; then

@@ -184,7 +184,7 @@ function install_xserver-xorg-input-evdev {
         info PI-TFT "**** Installing xserver-xorg-input-evdev package ****"
         info PI-TFT "No xserver-xorg-input-evdev. Installing it now."
         apt update
-        apt install xserver-xorg-input-evdev
+        apt install -y xserver-xorg-input-evdev
     fi
     if [ ! -f /usr/share/X11/xorg.conf.d/45-evdev.conf ]; then
             info PI-TFT "Creating /usr/share/X11/xorg.conf.d/45-evdev.conf"

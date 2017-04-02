@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.4-1.13.1"
+VERSION="4.4-1.13.2"
 
 
 function print_version() {
@@ -114,11 +114,14 @@ function print_help() {
     echo "                                             'wave32'   (Waveshare 3.2\")"
     echo "                                             'wave35'   (Waveshare 3.5\")"
     echo "                                             'wave35o'  (Waveshare 3.5\" Overclocked)"
-    echo "                                             'wave35c'  (Waveshare 3.5\" Clone - Try this for clones when wave35 fails)"
+    echo "                                             'wave35c'  (Waveshare 3.5\" Clones, such as:"
+    echo "                                                                         Elecrow 3.5\""
+    echo "                                                                         KeDei 3.5\""
+    echo "                                                                         Osoyoo 3.5\")"
     echo "                                             'wave40'   (Waveshare 4\")"
     echo "                                             'wave50'   (Waveshare 5\" HDMI)"
     echo
-    echo "You must specify a type of display."
+    echo "You must specify a type of display. Try \"wave35c\" if you are unsure what to use."
     exit 1
 }
 
@@ -689,7 +692,10 @@ if [ "${pitfttype}" != "28r" ] && [ "${pitfttype}" != "28c" ] && [ "${pitfttype}
     echo "  'wave32'   (Waveshare 3.2\")"
     echo "  'wave35'   (Waveshare 3.5\")"
     echo "  'wave35o'  (Waveshare 3.5\" Overclocked)"
-    echo "  'wave35c'  (Waveshare 3.5\" Clone - Try this for clones when wave35 fails)"
+    echo "  'wave35c'  (Waveshare 3.5\" Clones, such as:"
+    echo "                              Elecrow 3.5\""
+    echo "                              KeDei 3.5\""
+    echo "                              Osoyoo 3.5\")"
     echo "  'wave40'   (Waveshare 4\")"
     echo "  'wave50'   (Waveshare 5\" HDMI)"
     echo

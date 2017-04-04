@@ -83,6 +83,6 @@ re4son-pi-tft-setup -r
  or
 
 ```sh
-re4son-pi-tft-setup -r -u /root
+re4son-pi-tft-setup -r -d /root
 ``` 
  

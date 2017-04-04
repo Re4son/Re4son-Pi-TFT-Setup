@@ -47,9 +47,6 @@ tar -xJf re4son_kali-pi-tft_kernel_current.tar.xz
 cd re4son_kali-pi-tft_kernel_4*
 sudo ./install.sh
 ```
-This can take a surprisingly long time to finish, especially if you're using a
-slower SD card, so be patient.
-
 Reboot.
 
 ## Updating Re4son-Pi-TFT-Setup

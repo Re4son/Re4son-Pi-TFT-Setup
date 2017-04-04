@@ -42,9 +42,9 @@ Install Sticky Finger's Kali-Pi Kernel:
 
 ```sh
 cd ~
-wget  http://whitedome.com.au/download/Kali-Pi-Kernels/re4son_kali-pi-tft_kernel_current.tar.gz
-tar -xf re4son_kali-pi-tft_kernel_current.tar.gz
-cd re4son_kali-pi-tft*
+wget  -O re4son_kali-pi-tft_kernel_current.tar.xz https://whitedome.com.au/re4son/downloads/11299/
+tar -xJf re4son_kali-pi-tft_kernel_current.tar.xz
+cd re4son_kali-pi-tft_kernel_4*
 sudo ./install.sh
 ```
 This can take a surprisingly long time to finish, especially if you're using a
@@ -58,7 +58,7 @@ This setup tool can be found in the root directory folder of the kernel package.
 To update it to the latest version, just run:
 
 ```sh
-./re4son-pi-tft-setup -d
+./re4son-pi-tft-setup -u
 ```
 
 ## Using Re4son-Pi-TFT-Setup
@@ -67,7 +67,7 @@ To update it to the latest version, just run:
 specifying the type of TFT to configure.  Invoke it like so:
 
 ```sh
-sudo re4son-pi-tft-setup -t 28r -u /root
+sudo re4son-pi-tft-setup -t 35r -d /root
 ```
 
 For a full list of available options, check the help:

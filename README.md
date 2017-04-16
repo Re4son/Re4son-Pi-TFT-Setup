@@ -26,7 +26,7 @@ The following products are fully supported:
 - [Waveshare 3.5"](http://www.waveshare.com/wiki/3.5inch_RPi_LCD_(A))
 - [Waveshare 5"](http://www.waveshare.com/wiki/5inch_HDMI_LCD)
 
-The following products are not fully supported yet and need some manually configuration:
+The following products may need some manual calibration:
 - Elecfreaks 2.2"
 - [Hotmcu HY28B 2.8"](http://www.hotmcu.com/28-touch-screen-tft-lcd-with-all-interface-p-63.html)
 - JBTek

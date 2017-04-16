@@ -9,9 +9,17 @@ This setup tool is used in [Sticky Finger's Kali Pi](https://www.whitedome.com.a
 Products:
 The following products are fully supported:
 
+- [4D Systems 4DPi-24-HAT](http://www.4dsystems.com.au/product/4DPi_24_HAT)
+- [4D Systems 4DPi-32](http://www.4dsystems.com.au/product/4DPi_32)
+- [4D Systems 4DPi-35](http://www.4dsystems.com.au/product/4DPi_35)
 - [PiTFT - Assembled 320x240 2.8" TFT+Touchscreen for Raspberry Pi](https://www.adafruit.com/product/1601)
 - [PiTFT - Assembled 480x320 3.5" TFT+Touchscreen for Raspberry Pi](https://www.adafruit.com/product/2097)
 - [Adafruit PiTFT 2.2" HAT Mini Kit - 320x240 2.2" TFT - No Touch](https://www.adafruit.com/product/2315)
+- Elecrow 3.5"
+- JBTek 3.5"
+- KeDei 3.5"
+- Kuman 3.5"
+- Osoyoo 3.5"
 - [Raspberry Pi 7" Touch Display - Rotate display 180 so power cable is at the top](https://www.raspberrypi.org/products/raspberry-pi-touch-display/)
 - [Sainsmart 3.5"](http://www.sainsmart.com/sainsmart-3-5-inch-tft-lcd-320-480-touch-screen-display-for-raspberry-pi-2-b-b.html)
 - [Waveshare 3.2"](http://www.waveshare.com/wiki/3.2inch_RPi_LCD_(B))

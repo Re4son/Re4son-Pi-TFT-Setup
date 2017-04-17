@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.4-1.14.2"
+VERSION="4.4-1.14.3"
 
 
 function print_version() {
@@ -510,7 +510,9 @@ function update_etcmodules() {
     elif [ "${pitfttype}" == "4dpi" ]; then
         ts_module="spi-bcm2835_dma
 i2c-dev
+#pwmbl
 ar1020-i2c
+#4dpi_touch
 4dpi"
         ## rotate screen
         sed -i 's/rootwait/4dpi.rotate=180 rootwait/g' "/boot/cmdline.txt"

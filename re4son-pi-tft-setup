@@ -467,6 +467,12 @@ EOF
 SUBSYSTEM=="input", ATTRS{name}=="ADS7846 Touchscreen", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
 EOF
     fi
+
+if [ "${pitfttype}" == "4dpi" ]; then
+        cat > /etc/udev/rules.d/95-AR1020.rules <<EOF
+SUBSYSTEM=="input", ATTRS{name}=="AR1020 Touchscreen", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
+EOF
+    fi
 }
 
 function install_console() {

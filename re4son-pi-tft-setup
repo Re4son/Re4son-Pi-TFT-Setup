@@ -442,6 +442,12 @@ EOF
 320 65536 0 -65536 0 15728640 65536
 EOF
     fi
+    
+    if [ "${pitfttype}" == "4dpi" ]; then
+        cat > /etc/pointercal <<EOF
+5803 131 -2411836 53 4296 -937452 65536
+EOF
+    fi
 }
 
 function update_udev() {

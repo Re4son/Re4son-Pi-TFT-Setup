@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.4-1.14.3"
+VERSION="4.9-1.14.4"
 
 
 function print_version() {
@@ -45,7 +45,7 @@ function check_update() {
     fi
     TEMP_FILE="/tmp/re4son-pi-tft-setup"
     info UPDATE "Downloading update"
-    wget -O ${TEMP_FILE} https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/rpts-4.4/re4son-pi-tft-setup
+    wget -O ${TEMP_FILE} https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/rpts-4.9/re4son-pi-tft-setup
     cp $TEMP_FILE $PROG_NAME
     chmod +x $PROG_NAME
     rm -f $TEMP_FILE
@@ -245,16 +245,16 @@ dtoverlay=ads7846,cs=1,penirq=17,penirq_pull=2,speed=1000000,keep_vref_on=1,swap
         overlay="dtoverlay=sainsmart32"
     fi
     if [ "${pitfttype}" == "sain35" ]; then
-        overlay="dtoverlay=waveshare35a,rotate=90"
+        overlay="dtoverlay=waveshare35a"
     fi
     if [ "${pitfttype}" == "wave32" ]; then
         overlay="dtoverlay=waveshare32b:rotate=270"
     fi
     if [ "${pitfttype}" == "wave35" ]; then
-        overlay="dtoverlay=waveshare35a,rotate=90"
+        overlay="dtoverlay=waveshare35a"
     fi
     if [ "${pitfttype}" == "wave35o" ]; then
-        overlay="dtoverlay=waveshare35a,speed=32000000,fps=50,rotate=90"
+        overlay="dtoverlay=waveshare35a,speed=32000000,fps=50"
     fi
     if [ "${pitfttype}" == "wave40" ]; then
         overlay="dtoverlay=waveshare35a:rotate=270"
@@ -388,7 +388,7 @@ Section "InputClass"
 EndSection
 EOF
     fi
-    
+
     libinput_path="/usr/share/X11/xorg.conf.d/60-libinput.conf"
     if [ -e $libinput_path ]; then
         info PI-TFT "Applying Neto calibration patch:"
@@ -442,7 +442,7 @@ EOF
 320 65536 0 -65536 0 15728640 65536
 EOF
     fi
-    
+
     if [ "${pitfttype}" == "4dpi" ]; then
         cat > /etc/pointercal <<EOF
 5803 131 -2411836 53 4296 -937452 65536

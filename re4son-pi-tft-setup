@@ -598,7 +598,7 @@ function update_bootprefs() {
       if [ -e /etc/init.d/lightdm ]; then
         if [ $SYSTEMD -eq 1 ]; then
           systemctl set-default multi-user.target
-          ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+          ## ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
         else
           update-rc.d lightdm disable 2
           sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"
@@ -613,7 +613,7 @@ function update_bootprefs() {
       if [ -e /etc/init.d/lightdm ]; then
         if [ $SYSTEMD -eq 1 ]; then
           systemctl set-default graphical.target
-          ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+          ## ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
         else
           update-rc.d lightdm enable 2
           sed /etc/inittab -i -e "s/1:2345:respawn:\/bin\/login -f pi tty1 <\/dev\/tty1 >\/dev\/tty1 2>&1/1:2345:respawn:\/sbin\/getty --noclear 38400 tty1/"

@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.4-1.15.3"
+VERSION="4.4-1.15.4"
 
 
 function print_version() {
@@ -597,6 +597,9 @@ function update_bootprefs() {
       mv -f /etc/X11/xorg.conf.d/99-fbdev.conf ~ 2> /dev/null
       if [ -e /etc/init.d/lightdm ]; then
         if [ $SYSTEMD -eq 1 ]; then
+          if [ -f /etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
+            rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service
+          fi
           systemctl set-default multi-user.target
           systemctl enable getty@tty1.service
           ## ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
@@ -613,6 +616,9 @@ function update_bootprefs() {
       mv -f ~/99-fbdev.conf /etc/X11/xorg.conf.d/ 2> /dev/null
       if [ -e /etc/init.d/lightdm ]; then
         if [ $SYSTEMD -eq 1 ]; then
+          if [ -f /etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
+            rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service
+          fi
           systemctl set-default graphical.target
           systemctl enable getty@tty1.service
           ## ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service

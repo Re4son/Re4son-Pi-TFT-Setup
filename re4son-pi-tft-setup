@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.4-1.14.3"
+VERSION="4.4-1.15.1"
 
 
 function print_version() {
@@ -15,16 +15,31 @@ function update_autologon() {
     if [[ $EUID -ne 0 ]]; then
         bail "re4son-pi-tft-setup must be run as root. try: sudo re4son-pi-tft-setup"
     fi
-    file="/etc/systemd/system/getty.target.wants/getty@tty1.service"
-    exec_line=`grep ExecStart $file`
+    file="/etc/systemd/system/getty@tty1.service.d/override.conf"
+    path=$(dirname "${file}")
     if [ "${user_name}" = "disable" ]; then
         info AUTOLOGON "Disabling autologon"
-        sed -i 's/ExecStart=-\/sbin\/agetty -a .*%I\+/ExecStart=-\/sbin\/agetty --noclear %I/g' $file
-        info AUTOLOGON "Done!"
+            if [ -f ${file} ]; then
+                rm -f ${file}
+            fi
+        info AUTOLOGON "Autologon disabled!"
     else
         info AUTOLOGON "Enabling autologon for user $user_name"
-        sed -i "s/ExecStart=-\/sbin\/agetty -.*%I/ExecStart=-\/sbin\/agetty -a $user_name %I/g" $file
-        info AUTOLOGON "Done!"
+        if [ ! -d ${path} ]; then
+            mkdir -p ${path}
+        fi
+        cat >> /boot/config.txt <<EOF
+
+# --- added by re4son-pi-tft-setup $date ---
+# enable autologin
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -a $user_name --noclear %I $TERM
+Type=idle
+# --- end re4son-pi-tft-setup $date ---
+EOF
+
+        info AUTOLOGON "Autologon enabled for user $user_name!"
     fi
     info AUTOLOGON "Old: $exec_line"
     exec_line=`grep ExecStart $file`

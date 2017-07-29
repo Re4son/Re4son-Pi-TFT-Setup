@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.4-1.15.4"
+VERSION="4.4-1.15.5"
 
 
 function print_version() {
@@ -26,6 +26,8 @@ function update_autologon() {
         ## Disableing when enabled with verion <= 4.x-1.14.3
         sed -i 's/ExecStart=-\/sbin\/agetty -a .*%I\+/ExecStart=-\/sbin\/agetty --noclear %I/g' $legacy_file
         info AUTOLOGON "Autologon disabled!"
+        ## systemd >233 breaks this so we have to re-enable the getty service
+        systemctl enable getty@tty1.service
     else
         info AUTOLOGON "Enabling autologon for user $user_name"
         if [ ! -d ${path} ]; then

@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.15.6"
+VERSION="4.9-1.16.1"
 
 
 function print_version() {
@@ -244,7 +244,7 @@ function update_configtxt() {
     if [ "${pitfttype}" == "35r" ]; then
       ## overlay="dtoverlay=pitft35r,rotate=90,speed=32000000,fps=20"
       ## overlay="dtoverlay=pitft35r,rotate=90,speed=42000000,fps=20"
-        overlay="dtoverlay=pitft35-resistive,rotate=90,speed=62000000,fps=30"
+        overlay="dtoverlay=pitft35-resistive,rotate=270,speed=42000000,fps=30"
     fi
 
     if [ "${pitfttype}" == "elec22" ]; then
@@ -776,13 +776,14 @@ fi
 info PI-TFT "Updating /etc/modules..."
 update_etcmodules || bail "Unable to update /etc/modules"
 
-if [ "${pitfttype}" == "28r" ] || [ "${pitfttype}" == "28c" ] || [ "${pitfttype}" == "22" ]; then
-    # ask for 'on/off' button
-    if ask "Would you like GPIO #23 to act as a on/off button?"; then
-        info PI-TFT "Adding GPIO #23 on/off to PiTFT..."
-        install_onoffbutton || bail "Unable to add on/off button"
-    fi
-fi
+## Problems with 4.9 kernel - disabled until I've fixed the driver
+##if [ "${pitfttype}" == "28r" ] || [ "${pitfttype}" == "28c" ] || [ "${pitfttype}" == "22" ]; then
+##    # ask for 'on/off' button
+##    if ask "Would you like GPIO #23 to act as a on/off button?"; then
+##        info PI-TFT "Adding GPIO #23 on/off to PiTFT..."
+##        install_onoffbutton || bail "Unable to add on/off button"
+##    fi
+##fi
 
 if [ "${pitfttype}" == "elec22" ] || [ "${pitfttype}" == "jb35" ] || [ "${pitfttype}" == "sain32" ]; then
     echo "Your screen is configured for console use"

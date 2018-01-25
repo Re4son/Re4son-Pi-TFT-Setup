@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.17.0"
+VERSION="4.9-1.18.0"
 
 
 function print_version() {
@@ -15,28 +15,34 @@ function update_autologon() {
     if [[ $EUID -ne 0 ]]; then
         bail "re4son-pi-tft-setup must be run as root. try: sudo re4son-pi-tft-setup"
     fi
+
+    ## We'll always start with a clean slate, i.e. no autologon
     file="/etc/systemd/system/getty@tty1.service.d/override.conf"
     path=$(dirname "${file}")
     legacy_file="/etc/systemd/system/getty.target.wants/getty@tty1.service"
-    if [ "${user_name}" = "disable" ]; then
-        info AUTOLOGON "Disabling autologon"
-            if [ -f ${file} ]; then
-                rm -f ${file}
+    info AUTOLOGON "Disabling autologon"
+    if [ -f ${file} ]; then
+        rm -f ${file}
+    fi
+    ## Disabling when enabled with verion <= 4.x-1.14.3
+    sed -i 's/ExecStart=-\/sbin\/agetty -a .*%I\+/ExecStart=-\/sbin\/agetty --noclear %I/g' $legacy_file
+    info AUTOLOGON "Autologon disabled!"
+    ## systemd >233 breaks this so we have to re-enable the getty service
+    if [ -f /etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
+        rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service
+    fi
+    systemctl enable getty@tty1.service
+    sed /etc/lightdm/lightdm.conf -i -e "s/^autologin-user=.*/#autologin-user=/" 
+
+    ## Now we enable autologon if so desired
+    if [ "${user_name}" != "disable" ]; then
+        target=$(systemctl get-default)
+        if [ "${target}" == "multi-user.target" ]; then 
+            info AUTOLOGON "Enabling autologon for user $user_name"
+            if [ ! -d ${path} ]; then
+                mkdir -p ${path}
             fi
-        ## Disabling when enabled with verion <= 4.x-1.14.3
-        sed -i 's/ExecStart=-\/sbin\/agetty -a .*%I\+/ExecStart=-\/sbin\/agetty --noclear %I/g' $legacy_file
-        info AUTOLOGON "Autologon disabled!"
-        ## systemd >233 breaks this so we have to re-enable the getty service
-        if [ -f /etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
-            rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service
-        fi
-        systemctl enable getty@tty1.service
-    else
-        info AUTOLOGON "Enabling autologon for user $user_name"
-        if [ ! -d ${path} ]; then
-            mkdir -p ${path}
-        fi
-        cat >> ${file} <<EOF
+            cat >> ${file} <<EOF
 # --- added by re4son-pi-tft-setup $date ---
 # enable autologin
 [Service]
@@ -45,17 +51,13 @@ ExecStart=-/sbin/agetty -a $user_name --noclear %I $TERM
 Type=idle
 # --- end re4son-pi-tft-setup $date ---
 EOF
-
+        fi
+        if [ "${target}" == "graphical.target" ]; then 
+            info AUTOLOGON "Enabling autologon for user $user_name"
+            sed /etc/lightdm/lightdm.conf -i -e "s/^\(#\|\)autologin-user=.*/autologin-user=$user_name/" 
+        fi	
         info AUTOLOGON "Autologon enabled for user $user_name!"
     fi
-    echo
-    read -p "Reboot to apply changes? (y/n): " -n 1 -r
-    echo
-
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-       reboot
-    fi
-    exit 0
 }
 
 function check_update() {
@@ -700,6 +702,13 @@ do
         -a)
             user_name="$2"
             update_autologon
+            echo
+            read -p "Reboot to apply changes? (y/n): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                reboot
+            fi
+	    exit 0
             ;;
         -u)
             check_update
@@ -709,6 +718,8 @@ do
             shift
             ;;
         -b)
+            user_name="disable"
+            update_autologon
             boot_pref="$2"
             update_bootprefs
             ;;

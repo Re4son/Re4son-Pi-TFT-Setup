@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.18.1"
+VERSION="4.9-1.18.3"
 
 
 function print_version() {
@@ -337,7 +337,7 @@ function update_xorg() {
 Section "Device"
   Identifier "myfb"
   Driver "fbdev"
-  Option "fbdev" $FRAMEBUFFER
+  Option "fbdev" "$FRAMEBUFFER"
 EndSection
 EOF
 

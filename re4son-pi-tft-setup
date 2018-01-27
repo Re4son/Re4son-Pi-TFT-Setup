@@ -472,6 +472,7 @@ export FRAMEBUFFER=/dev/fb1
 # --- end re4son-pi-tft-setup $date ---
 EOF
         fi
+    fi
 }
 
 # currently for '90' rotation only

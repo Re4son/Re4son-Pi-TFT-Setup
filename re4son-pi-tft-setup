@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.18.0"
+VERSION="4.9-1.18.1"
 
 
 function print_version() {
@@ -337,7 +337,7 @@ function update_xorg() {
 Section "Device"
   Identifier "myfb"
   Driver "fbdev"
-  Option "fbdev" "/dev/fb1"
+  Option "fbdev" $FRAMEBUFFER
 EndSection
 EOF
 
@@ -449,7 +449,7 @@ function update_x11profile() {
         echo "Moving ${fbturbo_path} to ${target_homedir}"
         mv "$fbturbo_path" "$target_homedir"
     fi
-    if [ "${pitfttype}" == "wave50" ] || [ "${pitfttype}" == "wave35h" ]; then
+    if [ $HDMI ]; then
 	cat > "$fbturbo_path" <<EOF
 Section "Device"
         Identifier      "Allwinner A10/A13 FBDEV"
@@ -460,18 +460,18 @@ Section "Device"
 EndSection
 EOF
     fi
-
-    if grep -xq "export FRAMEBUFFER=/dev/fb1" "${target_homedir}/.profile"; then
-        echo "Already had 'export FRAMEBUFFER=/dev/fb1'"
-    else
-        echo "Adding 'export FRAMEBUFFER=/dev/fb1'"
-        date=`date`
-        cat >> "${target_homedir}/.profile" <<EOF
+    if [ ! $HDMI ]; then
+        if grep -xq "export FRAMEBUFFER=/dev/fb1" "${target_homedir}/.profile"; then
+            echo "Already had 'export FRAMEBUFFER=/dev/fb1'"
+        else
+            echo "Adding 'export FRAMEBUFFER=/dev/fb1'"
+            date=`date`
+            cat >> "${target_homedir}/.profile" <<EOF
 # --- added by re4son-pi-tft-setup $date ---
 export FRAMEBUFFER=/dev/fb1
 # --- end re4son-pi-tft-setup $date ---
 EOF
-    fi
+        fi
 }
 
 # currently for '90' rotation only
@@ -794,6 +794,16 @@ if [ "${pitfttype}" == "pi70" ]; then
         reboot
     fi
     exit 0
+fi
+
+if [ "${pitfttype}" == "wave50" ] || [ "${pitfttype}" == "wave35h" ]; then
+    HDMI="1"
+fi
+
+if [ $HDMI ]; then
+    FRAMEBUFFER="/dev/fb0"
+else
+    FRAMEBUFFER="/dev/fb1"
 fi
 
 if [ "${pitfttype}" == "wave35c" ]; then

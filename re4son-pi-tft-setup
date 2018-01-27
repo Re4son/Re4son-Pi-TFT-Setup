@@ -784,13 +784,16 @@ else
         info PI-TFT "Mounting /boot"
 	mount /dev/mmcblk0p1 /boot
     fi
-fi 
-if grep -q boot /proc/mounts; then
-    info PI-TFT "/boot is mounted"
-else
-    echo "/boot must be mounted. if you think it's not, quit here and try: sudo mount /dev/mmcblk0p1 /boot"
-    bail "Aborting."
-    info PI-TFT "Proceeding."
+    if grep -q boot /proc/mounts; then
+        info PI-TFT "/boot is mounted"
+    else
+        echo "/boot must be mounted. If you're sure it is, proceed - otherwise quit here and try: sudo mount /dev/mmcblk0p1 /boot"
+	if ask "Continue?"; then
+	    info PI-TFT "Proceeding."
+	else
+	    bail "Aborting."
+	fi
+    fi
 fi
 
 if [[ ! -e "$target_homedir" || ! -d "$target_homedir" ]]; then

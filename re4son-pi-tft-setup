@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.18.3"
+VERSION="4.9-1.19.0"
 
 
 function print_version() {
@@ -137,7 +137,8 @@ function print_help() {
     echo "                                             'sain32'   (Sainsmart 3.2\")"
     echo "                                             'sain35'   (Sainsmart 3.5\")"
     echo "                                             'wave32'   (Waveshare 3.2\")"
-    echo "                                             'wave35'   (Waveshare 3.5\")"
+    echo "                                             'wave35'   (Waveshare 3.5\" (a))"
+    echo "                                             'wave35b'  (Waveshare 3.5\" (b))"
     echo "                                             'wave35o'  (Waveshare 3.5\" Overclocked)"
     echo "                                             'wave35h'  (Waveshare 3.5\" HDMI)"
     echo "                                             'wave35c'  (Waveshare 3.5\" Clones, such as:"
@@ -276,6 +277,9 @@ function update_configtxt() {
     if [ "${pitfttype}" == "wave35" ]; then
         overlay="dtoverlay=waveshare35a"
     fi
+    if [ "${pitfttype}" == "wave35b" ]; then
+        overlay="dtoverlay=waveshare35b"
+    fi
     if [ "${pitfttype}" == "wave35h" ]; then
         overlay="hdmi_group=2
 hdmi_mode=1
@@ -394,7 +398,7 @@ Section "InputClass"
 EndSection
 EOF
     fi
-    if [ "${pitfttype}" == "wave35" ] || [ "${pitfttype}" == "wave35o" ] || [ "${pitfttype}" == "kum35" ] || [ "${pitfttype}" == "sain35" ]; then
+    if [ "${pitfttype}" == "wave35" ] || [ "${pitfttype}" == "wave35b" ] || [ "${pitfttype}" == "wave35o" ] || [ "${pitfttype}" == "kum35" ] || [ "${pitfttype}" == "sain35" ]; then
         cat > /etc/X11/xorg.conf.d/99-calibration.conf <<EOF
 Section "InputClass"
          Identifier "calibration"
@@ -429,7 +433,7 @@ EOF
 Section "InputClass"
         Identifier      "calibration"
         MatchProduct    "ADS7846 Touchscreen"
-        Option  "Calibration"   "208 3905 288 3910"
+        Option  "Calibration"   "138 3952 214 4002"
         Option  "SwapAxes"      "0"
 EndSection
 EOF
@@ -449,26 +453,44 @@ function update_x11profile() {
         echo "Moving ${fbturbo_path} to ${target_homedir}"
         mv "$fbturbo_path" "$target_homedir"
     fi
-    if [ $HDMI ]; then
-	cat > "$fbturbo_path" <<EOF
-Section "Device"
-        Identifier      "Allwinner A10/A13 FBDEV"
-        Driver          "fbturbo"
-        Option          "fbdev" "/dev/fb0"
+##    if [ $HDMI ]; then
+##	cat > "$fbturbo_path" <<EOF
+##Section "Device"
+##        Identifier      "Allwinner A10/A13 FBDEV"
+##        Driver          "fbturbo"
+##        Option          "fbdev" "/dev/fb0"
 
-        Option          "SwapbuffersWait" "true"
-EndSection
-EOF
-    fi
+##        Option          "SwapbuffersWait" "true"
+##EndSection
+##EOF
+##    fi
     if [ ! $HDMI ]; then
-        if grep -xq "export FRAMEBUFFER=/dev/fb1" "${target_homedir}/.profile"; then
+        if grep -q "export FRAMEBUFFER=/dev/fb1" "${target_homedir}/.profile"; then
             echo "Already had 'export FRAMEBUFFER=/dev/fb1'"
+        elif grep -xq "export FRAMEBUFFER=/dev/fb0" "${target_homedir}/.profile"; then
+            echo "Adding 'export FRAMEBUFFER=/dev/fb1'"
+	    sed "${target_homedir}/.profile" -i -e "s/export FRAMEBUFFER=\/dev\/fb0/export FRAMEBUFFER=\/dev\/fb1/"
         else
             echo "Adding 'export FRAMEBUFFER=/dev/fb1'"
             date=`date`
             cat >> "${target_homedir}/.profile" <<EOF
 # --- added by re4son-pi-tft-setup $date ---
 export FRAMEBUFFER=/dev/fb1
+# --- end re4son-pi-tft-setup $date ---
+EOF
+        fi
+    else
+        if grep -xq "export FRAMEBUFFER=/dev/fb0" "${target_homedir}/.profile"; then
+            echo "Already had 'export FRAMEBUFFER=/dev/fb0'"
+        elif grep -xq "export FRAMEBUFFER=/dev/fb0" "${target_homedir}/.profile"; then
+            echo "Adding 'export FRAMEBUFFER=/dev/fb0'"
+	    sed "${target_homedir}/.profile" -i -e "s/export FRAMEBUFFER=\/dev\/fb1/export FRAMEBUFFER=\/dev\/fb0/"
+        else
+            echo "Adding 'export FRAMEBUFFER=/dev/fb0'"
+            date=`date`
+            cat >> "${target_homedir}/.profile" <<EOF
+# --- added by re4son-pi-tft-setup $date ---
+export FRAMEBUFFER=/dev/fb0
 # --- end re4son-pi-tft-setup $date ---
 EOF
         fi
@@ -489,7 +511,7 @@ EOF
 EOF
     fi
 
-    if [ "${pitfttype}" == "wave35" ] || [ "${pitfttype}" == "wave35o" ] || [ "${pitfttype}" == "kum35" ] || [ "${pitfttype}" == "sain35" ]; then
+    if [ "${pitfttype}" == "wave35" ] || [ "${pitfttype}" == "wave35b" ] || [ "${pitfttype}" == "wave35o" ] || [ "${pitfttype}" == "kum35" ] || [ "${pitfttype}" == "sain35" ]; then
         cat > /etc/pointercal <<EOF
 8 -8432 32432138 5699 -112 -965922 65536
 EOF
@@ -526,7 +548,7 @@ SUBSYSTEM=="input", ATTRS{name}=="ADS7843 Touchscreen", ENV{DEVNAME}=="*event*",
 EOF
     fi
 
-    if [ "${pitfttype}" == "wave32" ] || [ "${pitfttype}" == "wave35" ] || [ "${pitfttype}" == "wave35o" ] || [ "${pitfttype}" == "kum35" ]   || [ "${pitfttype}" == "sain35" ] || [ "${pitfttype}" == "wave40" ] || [ "${pitfttype}" == "wave50" ]; then
+    if [ "${pitfttype}" == "wave32" ] || [ "${pitfttype}" == "wave35" ] || [ "${pitfttype}" == "wave35b" ] || [ "${pitfttype}" == "wave35o" ] || [ "${pitfttype}" == "kum35" ]   || [ "${pitfttype}" == "sain35" ] || [ "${pitfttype}" == "wave40" ] || [ "${pitfttype}" == "wave50" ]; then
         cat > /etc/udev/rules.d/95-ADS7846.rules <<EOF
 SUBSYSTEM=="input", ATTRS{name}=="ADS7846 Touchscreen", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
 EOF
@@ -758,12 +780,17 @@ fi
 if grep -q boot /proc/mounts; then
     info PI-TFT "/boot is mounted"
 else
-    echo "/boot must be mounted. if you think it's not, quit here and try: sudo mount /dev/mmcblk0p1 /boot"
-    if ask "Continue?"; then
-        info PI-TFT "Proceeding."
-    else
-        bail "Aborting."
+    if ask "Cannot find /boot. Maybe it is not mounted. Shall I try mounting it?"; then
+        info PI-TFT "Mounting /boot"
+	mount /dev/mmcblk0p1 /boot
     fi
+fi 
+if grep -q boot /proc/mounts; then
+    info PI-TFT "/boot is mounted"
+else
+    echo "/boot must be mounted. if you think it's not, quit here and try: sudo mount /dev/mmcblk0p1 /boot"
+    bail "Aborting."
+    info PI-TFT "Proceeding."
 fi
 
 if [[ ! -e "$target_homedir" || ! -d "$target_homedir" ]]; then
@@ -774,7 +801,7 @@ if [ "${removetft}" == "YES" ]; then
     remove_tft || bail "Unable to remove tft configuration"
 fi
 
-if [ "${pitfttype}" != "4dpi" ] && [ "${pitfttype}" != "28r" ] && [ "${pitfttype}" != "28c" ] && [ "${pitfttype}" != "35r" ] && [ "${pitfttype}" != "22" ] && [ "${pitfttype}" != "elec22" ] && [ "${pitfttype}" != "hy28b" ] && [ "${pitfttype}" != "jb35" ] && [ "${pitfttype}" != "kum35" ] && [ "${pitfttype}" != "pi70" ] && [ "${pitfttype}" != "sain32" ] && [ "${pitfttype}" != "sain35" ] && [ "${pitfttype}" != "wave32" ] && [ "${pitfttype}" != "wave35" ] && [ "${pitfttype}" != "wave35o" ] && [ "${pitfttype}" != "wave35c" ] && [ "${pitfttype}" != "wave35h" ] && [ "${pitfttype}" != "wave40" ] && [ "${pitfttype}" != "wave50" ]; then
+if [ "${pitfttype}" != "4dpi" ] && [ "${pitfttype}" != "28r" ] && [ "${pitfttype}" != "28c" ] && [ "${pitfttype}" != "35r" ] && [ "${pitfttype}" != "22" ] && [ "${pitfttype}" != "elec22" ] && [ "${pitfttype}" != "hy28b" ] && [ "${pitfttype}" != "jb35" ] && [ "${pitfttype}" != "kum35" ] && [ "${pitfttype}" != "pi70" ] && [ "${pitfttype}" != "sain32" ] && [ "${pitfttype}" != "sain35" ] && [ "${pitfttype}" != "wave32" ] && [ "${pitfttype}" != "wave35" ] && [ "${pitfttype}" != "wave35b" ] && [ "${pitfttype}" != "wave35o" ] && [ "${pitfttype}" != "wave35c" ] && [ "${pitfttype}" != "wave35h" ] && [ "${pitfttype}" != "wave40" ] && [ "${pitfttype}" != "wave50" ]; then
     echo "Invalid screen. Choose a valid type from the list below."
     print_help
 fi

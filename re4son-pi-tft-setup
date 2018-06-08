@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.19.0"
+VERSION="4.9-1.19.1"
 
 
 function print_version() {
@@ -250,7 +250,8 @@ function update_configtxt() {
     if [ "${pitfttype}" == "35r" ]; then
       ## overlay="dtoverlay=pitft35r,rotate=90,speed=32000000,fps=20"
       ## overlay="dtoverlay=pitft35r,rotate=90,speed=42000000,fps=20"
-        overlay="dtoverlay=pitft35-resistive,rotate=270,speed=42000000,fps=30"
+      ## overlay="dtoverlay=pitft35-resistive,rotate=270,speed=42000000,fps=30"
+      overlay="dtoverlay=pitft35-resistive,rotate=270,speed=25000000,fps=20"
     fi
 
     if [ "${pitfttype}" == "elec22" ]; then

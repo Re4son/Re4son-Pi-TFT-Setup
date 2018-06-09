@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.19.3"
+VERSION="4.9-1.19.4"
 
 
 function print_version() {
@@ -535,6 +535,12 @@ EOF
 13874 297 -2846048 -151 8401 -1722344 65536 800 480
 EOF
     fi
+    
+    if [ "${pitfttype}" == "pi70" ]; then
+        cat > /etc/pointercal <<EOF
+13874 297 -2846048 -151 8401 -1722344 65536 800 480
+EOF
+    fi
 }
 
 function update_udev() {
@@ -564,6 +570,12 @@ EOF
 if [ "${pitfttype}" == "4dpi" ]; then
         cat > /etc/udev/rules.d/95-AR1020.rules <<EOF
 SUBSYSTEM=="input", ATTRS{name}=="AR1020 Touchscreen", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
+EOF
+    fi
+    
+if [ "${pitfttype}" == "pi70" ]; then
+        cat > /etc/udev/rules.d/95-ft5406.rules <<EOF
+SUBSYSTEM=="input", ATTRS{name}=="FT5406 memory based driver", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
 EOF
     fi
 }
@@ -823,15 +835,15 @@ if [ "${pitfttype}" == "pi70" ]; then
     info PI-TFT "Updating /boot/config.txt to turn the screen around..."
     update_configtxt || bail "Unable to update /boot/config.txt"
 
-    info PI-TFT "Success!"
+    ###info PI-TFT "Success!"
 
-    echo
-    read -p "Reboot to apply changes? (y/n): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        reboot
-    fi
-    exit 0
+    ###echo
+    ###read -p "Reboot to apply changes? (y/n): " -n 1 -r
+    ###echo
+    ###if [[ $REPLY =~ ^[Yy]$ ]]; then
+    ###    reboot
+    ###fi
+    ###exit 0
 fi
 
 if [ "${pitfttype}" == "wave50" ] || [ "${pitfttype}" == "wave35h" ]; then

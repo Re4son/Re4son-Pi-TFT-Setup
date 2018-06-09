@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.19.1"
+VERSION="4.9-1.19.2"
 
 
 function print_version() {
@@ -527,6 +527,12 @@ EOF
     if [ "${pitfttype}" == "4dpi" ]; then
         cat > /etc/pointercal <<EOF
 5803 131 -2411836 53 4296 -937452 65536
+EOF
+    fi
+    
+    if [ "${pitfttype}" == "wave50" ]; then
+        cat > /etc/pointercal <<EOF
+-2090328 14009 -231 -2095180 -195 8551 65536
 EOF
     fi
 }

@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.19.6"
+VERSION="4.9-1.19.7"
 
 
 function print_version() {
@@ -124,8 +124,8 @@ function print_help() {
     echo "    -r            Remove TFT configuration (undo setup)"
     echo "    -d [dir]      Specify path of user's home directory to back up and restore some files (defaults to /home/pi)"
     echo "    -t [type]     Specify the type of TFT:"
-    echo "                                             '28r'      (Adafruit 2.8\" capacitive)"
-    echo "                                             '28c'      (Adafruit 2.8\" resistive)"
+    echo "                                             '28r'      (Adafruit 2.8\" resistive)"
+    echo "                                             '28c'      (Adafruit 2.8\" capacitive)"
     echo "                                             '35r'      (Adafruit 3.5\")"
     echo "                                             '35ro'     (Adafruit 3.5\") Overclocked"
     echo "                                             '22'       (Adafruit 2.2\")"

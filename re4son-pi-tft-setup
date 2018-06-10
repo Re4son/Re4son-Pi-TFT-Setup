@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.19.4"
+VERSION="4.9-1.19.5"
 
 
 function print_version() {
@@ -124,9 +124,10 @@ function print_help() {
     echo "    -r            Remove TFT configuration (undo setup)"
     echo "    -d [dir]      Specify path of user's home directory to back up and restore some files (defaults to /home/pi)"
     echo "    -t [type]     Specify the type of TFT:"
-    echo "                                             '28r'      (Adafruit 2.8\" PID 1601)"
-    echo "                                             '28c'      (Adafruit 2.8\" PID 1983)"
+    echo "                                             '28r'      (Adafruit 2.8\")"
+    echo "                                             '28c'      (Adafruit 2.8\")"
     echo "                                             '35r'      (Adafruit 3.5\")"
+    echo "                                             '35ro'     (Adafruit 3.5\") Overclocked"
     echo "                                             '22'       (Adafruit 2.2\")"
     echo "                                             '4dpi'     (4D Systems 2.4\",3.2\" and 3.5\")"
     echo "                                             'elec22'   (Elecfreak 2.2\")"
@@ -253,6 +254,12 @@ function update_configtxt() {
       ## overlay="dtoverlay=pitft35-resistive,rotate=270,speed=42000000,fps=30"
       overlay="dtoverlay=pitft35-resistive,rotate=270,speed=25000000,fps=20"
     fi
+    
+    if [ "${pitfttype}" == "35ro" ]; then
+      ## overlay="dtoverlay=pitft35r,rotate=90,speed=32000000,fps=20"
+      ## overlay="dtoverlay=pitft35r,rotate=90,speed=42000000,fps=20"
+      overlay="dtoverlay=pitft35-resistive,rotate=270,speed=42000000,fps=30"
+    fi
 
     if [ "${pitfttype}" == "elec22" ]; then
         overlay="dtoverlay=elec22"
@@ -357,7 +364,7 @@ EndSection
 EOF
     fi
 
-    if [ "${pitfttype}" == "35r" ]; then
+    if [[ "${pitfttype}" =~ 35r.* ]]; then
         cat > /etc/X11/xorg.conf.d/99-calibration.conf <<EOF
 Section "InputClass"
         Identifier      "calibration"
@@ -506,7 +513,7 @@ function update_pointercal() {
 EOF
     fi
 
-    if [ "${pitfttype}" == "35r" ]; then
+    if [[ "${pitfttype}" =~ 35r.* ]]; then
         cat > /etc/pointercal <<EOF
 8 -8432 32432138 5699 -112 -965922 65536
 EOF
@@ -544,7 +551,7 @@ EOF
 }
 
 function update_udev() {
-    if [ "${pitfttype}" == "28r" ] || [ "${pitfttype}" == "35r" ]; then
+    if [ "${pitfttype}" == "28r" ] || [[ "${pitfttype}" =~ 35r.* ]]; then
         cat > /etc/udev/rules.d/95-stmpe.rules <<EOF
 SUBSYSTEM=="input", ATTRS{name}=="stmpe-ts", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
 EOF
@@ -604,7 +611,7 @@ function uninstall_console() {
 function update_etcmodules() {
     if [ "${pitfttype}" == "28c" ]; then
         ts_module="ft6x06_ts"
-    elif [ "${pitfttype}" == "28r" ] || [ "${pitfttype}" == "35r" ]; then
+    elif [ "${pitfttype}" == "28r" ] || [[ "${pitfttype}" =~ 35r.* ]]; then
         ts_module="stmpe_ts"
     elif [ "${pitfttype}" == "4dpi" ]; then
         ts_module="spi-bcm2835_dma
@@ -823,7 +830,27 @@ if [ "${removetft}" == "YES" ]; then
     remove_tft || bail "Unable to remove tft configuration"
 fi
 
-if [ "${pitfttype}" != "4dpi" ] && [ "${pitfttype}" != "28r" ] && [ "${pitfttype}" != "28c" ] && [ "${pitfttype}" != "35r" ] && [ "${pitfttype}" != "22" ] && [ "${pitfttype}" != "elec22" ] && [ "${pitfttype}" != "hy28b" ] && [ "${pitfttype}" != "jb35" ] && [ "${pitfttype}" != "kum35" ] && [ "${pitfttype}" != "pi70" ] && [ "${pitfttype}" != "sain32" ] && [ "${pitfttype}" != "sain35" ] && [ "${pitfttype}" != "wave32" ] && [ "${pitfttype}" != "wave35" ] && [ "${pitfttype}" != "wave35b" ] && [ "${pitfttype}" != "wave35o" ] && [ "${pitfttype}" != "wave35c" ] && [ "${pitfttype}" != "wave35h" ] && [ "${pitfttype}" != "wave40" ] && [ "${pitfttype}" != "wave50" ]; then
+if [ "${pitfttype}" != "4dpi" ] && \
+   [ "${pitfttype}" != "28r" ] && \
+   [ "${pitfttype}" != "28c" ] && \
+   [ "${pitfttype}" != "35r" ] && \
+   [ "${pitfttype}" != "35ro" ] && \
+   [ "${pitfttype}" != "22" ] && \
+   [ "${pitfttype}" != "elec22" ] && \
+   [ "${pitfttype}" != "hy28b" ] && \
+   [ "${pitfttype}" != "jb35" ] && \
+   [ "${pitfttype}" != "kum35" ] && \
+   [ "${pitfttype}" != "pi70" ] && \
+   [ "${pitfttype}" != "sain32" ] && \
+   [ "${pitfttype}" != "sain35" ] && \
+   [ "${pitfttype}" != "wave32" ] && \
+   [ "${pitfttype}" != "wave35" ] && \
+   [ "${pitfttype}" != "wave35b" ] && \
+   [ "${pitfttype}" != "wave35o" ] && \
+   [ "${pitfttype}" != "wave35c" ] && \
+   [ "${pitfttype}" != "wave35h" ] && \
+   [ "${pitfttype}" != "wave40" ] && \
+   [ "${pitfttype}" != "wave50" ]; then
     echo "Invalid screen. Choose a valid type from the list below."
     print_help
 fi

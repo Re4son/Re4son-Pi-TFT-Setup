@@ -873,7 +873,7 @@ if [ "${pitfttype}" == "pi70" ]; then
     ###exit 0
 fi
 
-if [ "${pitfttype}" == "wave50" ] || [ "${pitfttype}" == "wave35h" ]; then
+if [ "${pitfttype}" == "pi70" ] || [ "${pitfttype}" == "wave50" ] || [ "${pitfttype}" == "wave35h" ]; then
     HDMI="1"
 fi
 

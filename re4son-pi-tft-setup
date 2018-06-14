@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.9-1.19.7"
+VERSION="4.9-1.20.0"
 
 
 function print_version() {
@@ -545,7 +545,7 @@ EOF
     
     if [ "${pitfttype}" == "pi70" ]; then
         cat > /etc/pointercal <<EOF
-13874 297 -2846048 -151 8401 -1722344 65536 800 480
+66242 1508 -591604 531 67406 -647360 65536 800 480
 EOF
     fi
 }

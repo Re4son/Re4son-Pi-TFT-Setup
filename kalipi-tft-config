@@ -45,7 +45,7 @@ do_update() {
     echo "kalipi-tft-config Setup $VERSION"
     echo
     info UPDATE "With new version:"
-    "$PROG_NAME" --version
+    "$PROG_NAME" -v
     sleep 2 &&
     exec "$PROG_NAME"
 }

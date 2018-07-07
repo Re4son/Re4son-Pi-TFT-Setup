@@ -2,9 +2,13 @@
 
 set -e
 PROG_NAME="$0"
+BASE_NAME=$(basename $PROG_NAME)
 ARGS="$@"
 VERSION="4.14-0.0.1"
 INTERACTIVE=True
+CONFIG=/boot/config.txt
+CMDLINE=/boot/cmdline.txt
+TITLE="Kali-Pi Touchscreen Setup  Tool ($BASE_NAME)"
 
 function print_version() {
     echo "Kali-Pi TFT Config $VERSION"
@@ -30,8 +34,26 @@ function check_update() {
     exit 0
 }
 
+do_update() {
+    TEMP_FILE="/tmp/kalipi-tft-config"
+    info UPDATE "Downloading update"
+    wget -O ${TEMP_FILE} https://github.com/Re4son/Re4son-Pi-TFT-Setup/raw/rpts-4.14/kalipi-tft-config
+    cp $TEMP_FILE $PROG_NAME
+    chmod +x $PROG_NAME
+    rm -f $TEMP_FILE
+    info UPDATE "Replaced old version:"
+    echo "kalipi-tft-config Setup $VERSION"
+    echo
+    info UPDATE "With new version:"
+    "$PROG_NAME" --version
+    sleep 2 &&
+    exec "$PROG_NAME"
+}
+
 function remove_tft() {
-    info UPDATE "Removing TFT configuration"
+    if [ ! "$INTERACTIVE" = True ]; then
+        info UPDATE "Removing TFT configuration"
+    fi
     rm -f /etc/X11/xorg.conf.d/99-fbdev.conf
     rm -f /etc/X11/xorg.conf.d/99-calibration.conf
     rm -f /etc/pointercal
@@ -53,15 +75,19 @@ function remove_tft() {
     if [ -e ${target_homedir}/.60-libinput.conf.bak ]; then
         mv ${target_homedir}/.60-libinput.conf.bak /usr/share/X11/xorg.conf.d/60-libinput.conf
     fi
-    info UPDATE "TFT config removed"
-    echo
-    read -p "Reboot to apply changes? (y/n): " -n 1 -r
-    echo
+    if [ "$INTERACTIVE" = True ]; then
+        whiptail --msgbox "Touchscreen configuration successfully removed." 20 60
+        ASK_TO_REBOOT=1
+    else
+        info UPDATE "TFT config removed"
+        echo
+        read -p "Reboot to apply changes? (y/n): " -n 1 -r
+        echo
 
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-       reboot
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            reboot
+        fi
     fi
-    exit 0
 }
 
 function print_help() {
@@ -202,6 +228,39 @@ function update_profile() {
     fi
 }
 
+function install_console() {
+    if ! grep -q 'fbcon=map:10 fbcon=font:VGA8x8' /boot/cmdline.txt; then
+        info PI-TFT "Updating /boot/cmdline.txt"
+        sed -i 's/rootwait/rootwait fbcon=map:10 fbcon=font:VGA8x8/g' "/boot/cmdline.txt"
+    else
+        info PI-TFT "/boot/cmdline.txt already updated"
+    fi
+    if [ ! -f /etc/kbd/config ]; then
+        info PI-TFT "Creating /etc/kbd/config"
+        mkdir -p /etc/kbd
+        touch /etc/kbd/config
+    fi
+    sed -i 's/BLANK_TIME=.*/BLANK_TIME=0/g' "/etc/kbd/config"
+}
+
+function uninstall_console() {
+    sed -i 's/rootwait fbcon=map:10 fbcon=font:VGA8x8/rootwait/g' "/boot/cmdline.txt"
+    sed -i 's/BLANK_TIME=0/BLANK_TIME=10/g' "/etc/kbd/config"
+    info PI-TFT "Screen blanking time reset to 10 minutes"
+}
+
+function ask_console() {
+    if [ ! "$INTERACTIVE" = True ]; then
+        if ask "Would you like the console to appear on the PiTFT display?" "Y"; then
+            info PI-TFT "Updating console to PiTFT..."
+            install_console || bail "Unable to configure console"
+        else
+            info PI-TFT "Making sure console doesn't use PiTFT"
+            uninstall_console || bail "Unable to configure console"
+        fi
+    fi
+}
+
 function do_reboot() {
     if [ ! "$INTERACTIVE" = True ]; then
         if ask "Reboot to apply changes?" "Y"; then
@@ -216,8 +275,9 @@ function install_pi70() {
     FRAMEBUFFER="/dev/fb0"
 
     # update /boot/config.txt
+    info PI-TFT "Updating /boot/config.txt..."
     date=`date`
-    cat >> /boot/config.txt <<EOF
+    cat >>  $CONFIG <<EOF
 # --- added by re4son-pi-tft-setup $date ---
 # Flip screen so powerplug is at the top
 lcd_rotate=2
@@ -225,33 +285,51 @@ lcd_rotate=2
 EOF
 
     # update /etc/X11/xorg.conf.d
+    info PI-TFT "Updating X11 configuration..."
     update_xorg_conf
 
     # update /etc/X11/xorg.conf.d/99-calibration.conf
+    info PI-TFT "Updating X11 default calibration..."
 
     # moving /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+    info PI-TFT "Removing X11 fbturbo.conf..."
     update_fbturbo_conf
 
     # update ~/.profile
+    info PI-TFT "Updating user profile..."
     update_profile
 
     # update /etc/pointercal
+    info PI-TFT "Updating TSLib default calibration..."
     cat > /etc/pointercal <<EOF
 66242 1508 -591604 531 67406 -647360 65536 800 480
 EOF
 
     # update /etc/udev/rules.d/95-xxxxx.rules
+    info PI-TFT "Updating udev rules for Touchscreen..."
     cat > /etc/udev/rules.d/95-ft5406.rules <<EOF
 SUBSYSTEM=="input", ATTRS{name}=="FT5406 memory based driver", ENV{DEVNAME}=="*event*", SYMLINK+="input/touchscreen"
 EOF
 
     # update /etc/modules
+    info PI-TFT "Updating /etc/modules..."
 
     # update /boot/cmdline.txt
-    install_console
+    info PI-TFT "Updating console to TFT..."
+    ask_console
+
+    # resolve dependencies
+    info PI-TFT "Resolving dependencies..."
+    install_xserver-xorg-input-evdev
 
     # reboot?
     do_reboot
+
+    # Otherwise exit if not interactive
+    if [ ! "$INTERACTIVE" = True ]; then
+        exit 0
+    fi
+    
 }
 
 
@@ -358,7 +436,7 @@ $overlay
 ###########################################
 # --- end re4son-pi-tft-setup $date ---
 EOF
-    fi
+
 }
 
 # currently for '90' rotation only
@@ -586,27 +664,6 @@ EOF
     
 }
 
-function install_console() {
-    if ! grep -q 'fbcon=map:10 fbcon=font:VGA8x8' /boot/cmdline.txt; then
-        info PI-TFT "Updating /boot/cmdline.txt"
-        sed -i 's/rootwait/rootwait fbcon=map:10 fbcon=font:VGA8x8/g' "/boot/cmdline.txt"
-    else
-        info PI-TFT "/boot/cmdline.txt already updated"
-    fi
-    if [ ! -f /etc/kbd/config ]; then
-        info PI-TFT "Creating /etc/kbd/config"
-        mkdir -p /etc/kbd
-        touch /etc/kbd/config
-    fi
-    sed -i 's/BLANK_TIME=.*/BLANK_TIME=0/g' "/etc/kbd/config"
-}
-
-function uninstall_console() {
-    sed -i 's/rootwait fbcon=map:10 fbcon=font:VGA8x8/rootwait/g' "/boot/cmdline.txt"
-    sed -i 's/BLANK_TIME=0/BLANK_TIME=10/g' "/etc/kbd/config"
-    info PI-TFT "Screen blanking time reset to 10 minutes"
-}
-
 function update_etcmodules() {
     if [ "${pitfttype}" == "28c" ]; then
         ts_module="ft6x06_ts"
@@ -666,14 +723,134 @@ EOF
     fi
 }
 
+check_bin(){
+    BIN_PATH=$(which $1)
+    if [ "" = "$BIN_PATH" ]; then
+        echo 0
+    else
+        echo 1
+    fi
+}
 
+check_pkg(){
+    PKG_STATUS=$(dpkg-query -W --showformat='${Status}\n' $1|grep "install ok installed")
+    if [ "" = "$PKG_STATUS" ]; then
+        echo 0
+    else
+        echo 1
+    fi
+}
+
+calc_wt_size() {
+    # NOTE: it's tempting to redirect stderr to /dev/null, so supress error 
+    # output from tput. However in this case, tput detects neither stdout or 
+    # stderr is a tty and so only gives default 80, 24 values
+    WT_HEIGHT=17
+    WT_WIDTH=$(tput cols)
+
+    if [ -z "$WT_WIDTH" ] || [ "$WT_WIDTH" -lt 100 ]; then
+        WT_WIDTH=90
+    elif [ "$WT_WIDTH" -gt 178 ]; then
+        WT_WIDTH=120
+    else
+        WT_WIDTH=$((WT_WIDTH-10))
+    fi
+    WT_MENU_HEIGHT=$(($WT_HEIGHT-7))
+}
+
+function do_about() {
+    whiptail --msgbox "\
+kalipi-tft-config version $VERSION
+
+This tool provides a straight-forward way of setting
+up various TFT screens for the Kali-Pi.
+" 20 70 1
+}
+
+function do_kalipi_config() {
+    BIN_PATH=$(which kalipi-config)
+    if [ "" = "$BIN_PATH" ]; then
+    whiptail --msgbox "\
+Error:
+
+The tool "kalipi-config" cannot be found on this system.
+It can be installed from this site:
+
+https://github.com/Re4son/RPi-Tweaks/tree/master/kalipi-config
+" 20 70 1
+    else
+        exec $BIN_PATH
+    fi
+}
+
+do_finish() {
+    if [ $ASK_TO_REBOOT -eq 1 ]; then
+        whiptail --yesno "Would you like to reboot now?" 20 60 2
+        if [ $? -eq 0 ]; then # yes
+            sync
+            reboot
+        fi
+    fi
+    exit 0
+}
+
+function do_main_menu() {
+    INTERACTIVE=True
+    # Check dependencies
+    local PROGRAMS=("whiptail")
+    local PACKAGES=("whiptail")
+    local missingprogs=""
+    local missingpkgs=""
+    for i in "${!PROGRAMS[@]}"; do
+        if [ $(check_bin ${PROGRAMS[$i]}) -eq 0 ]; then
+            missingpkgs="${missingpkgs}${PACKAGES[$i]} "
+        fi
+    done
+    if [ "" != "$missingpkgs" ]; then
+        printf "\nThe following packages are missing:         $missingpkgs\n"
+        printf "Please install them before continuing, i.e.:\n"
+        printf "\nsudo apt install $missingpkgs\n\n"
+        exit 1
+    fi
+
+    calc_wt_size
+    while true; do
+        FUN=$(whiptail --title "$TITLE" --backtitle "$(cat /proc/device-tree/model| tr -d '\0')" --menu "Main Menu" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Finish --ok-button Select \
+            "1 Setup Display" "Setup a new display" \
+            "2 Remove Display" "Remove any existing display configuration" \
+            "3 Kali-Pi Config" "Run the kalipi-config setup tool for Kali-Pi" \
+            "4 Update" "Update $BASE_NAME" \
+            "5 About $BASE_NAME" "Information about $BASE_NAME" \
+            3>&1 1>&2 2>&3)
+        RET=$?
+        if [ $RET -eq 1 ]; then
+            return 0
+        elif [ $RET -eq 0 ]; then
+            case "$FUN" in
+                1\ *) do_about ;;
+                2\ *) remove_tft ;;
+                3\ *) do_kalipi_config ;;
+                4\ *) do_update ;;
+                5\ *) do_about ;;
+                *) whiptail --msgbox "Program error: unrecognized option" 20 60 1 ;;
+            esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+        fi
+    done
+}
+
+    
 # MAIN
 
 target_homedir="/home/pi"
 
+if [[ $# -eq 0 ]] ; then
+    do_main_menu
+    exit 0
+fi
+
 args=$(getopt -uo 'hvurit:o:d:' -- $*)
-[ $? != 0 ] && print_help
-INTERACTIVE=FALSE
+[ $? != 0 ] && do_main_menu
+INTERACTIVE=False
 set -- $args
 
 for i

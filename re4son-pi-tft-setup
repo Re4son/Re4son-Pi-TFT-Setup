@@ -3,7 +3,7 @@
 set -e
 PROG_NAME="$0"
 ARGS="$@"
-VERSION="4.14-1.20.0"
+VERSION="4.14-1.20.1"
 
 
 function print_version() {
@@ -806,7 +806,7 @@ fi
 if grep -q boot /proc/mounts; then
     info PI-TFT "/boot is mounted"
 else
-    if ask "Cannot find /boot. Maybe it is not mounted. Shall I try mounting it?"; then
+    if ask "Cannot find /boot. Maybe it is not mounted. Shall I try mounting it?" "Y"; then
         info PI-TFT "Mounting /boot"
 	mount /dev/mmcblk0p1 /boot
     fi
@@ -814,7 +814,7 @@ else
         info PI-TFT "/boot is mounted"
     else
         echo "/boot must be mounted. If you're sure it is, proceed - otherwise quit here and try: sudo mount /dev/mmcblk0p1 /boot"
-	if ask "Continue?"; then
+	if ask "Continue?" "N"; then
 	    info PI-TFT "Proceeding."
 	else
 	    bail "Aborting."
@@ -857,22 +857,6 @@ fi
 
 ## Start config
 
-## 7" Raspbery Pi only requies a little change in the /boot/config.txt then exit
-if [ "${pitfttype}" == "pi70" ]; then
-    info PI-TFT "Updating /boot/config.txt to turn the screen around..."
-    update_configtxt || bail "Unable to update /boot/config.txt"
-
-    ###info PI-TFT "Success!"
-
-    ###echo
-    ###read -p "Reboot to apply changes? (y/n): " -n 1 -r
-    ###echo
-    ###if [[ $REPLY =~ ^[Yy]$ ]]; then
-    ###    reboot
-    ###fi
-    ###exit 0
-fi
-
 if [ "${pitfttype}" == "pi70" ] || [ "${pitfttype}" == "wave50" ] || [ "${pitfttype}" == "wave35h" ]; then
     HDMI="1"
 fi
@@ -900,7 +884,7 @@ info PI-TFT "Updating SysFS rules for Touchscreen..."
 update_udev || bail "Unable to update /etc/udev/rules.d"
 
 # ask for console access
-if ask "Would you like the console to appear on the PiTFT display?"; then
+if ask "Would you like the console to appear on the PiTFT display?" "Y"; then
     info PI-TFT "Updating console to PiTFT..."
     install_console || bail "Unable to configure console"
 else
@@ -913,7 +897,7 @@ update_etcmodules || bail "Unable to update /etc/modules"
 
 if [ "${pitfttype}" == "28r" ] || [ "${pitfttype}" == "28c" ] || [ "${pitfttype}" == "22" ]; then
     # ask for 'on/off' button
-    if ask "Would you like GPIO #27 to act as a on/off button?"; then
+    if ask "Would you like GPIO #27 to act as a on/off button?" "Y"; then
         info PI-TFT "Adding GPIO #27 on/off to PiTFT..."
         install_onoffbutton || bail "Unable to add on/off button"
     fi
